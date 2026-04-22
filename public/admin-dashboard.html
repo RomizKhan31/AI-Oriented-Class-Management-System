@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Class Management | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+        .admin-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="nav-brand">Smart Class Admin</div>
+        <div class="d-flex align-center gap-2">
+            <span id="userName" class="text-slate"></span>
+            <button onclick="logout()" class="btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="glass-panel text-center mb-4">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--danger); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">A</div>
+            <h3 id="sidebarName">System Administrator</h3>
+            <span class="badge badge-danger">High Privilege</span>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-nav" style="justify-content: center">
+            <button class="tab-btn active" onclick="switchTab('provision-tab')">Provision Teacher</button>
+            <button class="tab-btn" onclick="switchTab('oversight-tab')">System Oversight</button>
+        </div>
+
+        <!-- Tab: Add Teacher -->
+        <div id="provision-tab" class="tab-pane active glass-panel text-center mb-4">
+            <h4 class="mb-4">Provision New Teacher</h4>
+            <p class="text-slate mb-4">As an Administrator, you uniquely have the authority to provision strict Teacher accounts with hardcoded Employee/Teacher IDs.</p>
+            
+            <form id="createTeacherForm">
+                <input type="text" id="teachId" class="input-glass mb-4" placeholder="Custom Teacher ID (e.g. INS-482)" required>
+                <input type="text" id="teachName" class="input-glass mb-4" placeholder="Full Name" required>
+                <input type="email" id="teachEmail" class="input-glass mb-4" placeholder="Email Address" required>
+                <input type="password" id="teachPassword" class="input-glass mb-4" placeholder="Secure Password" required>
+                <button type="submit" class="btn-primary" style="background:var(--danger)">Provision Teacher Account</button>
+            </form>
+        </div>
+
+        <!-- Tab: System Oversight -->
+        <div id="oversight-tab" class="tab-pane glass-panel">
+            <div class="d-flex justify-between align-center mb-4 border-bottom pb-2">
+                <h4>Platform Surveillance</h4>
+                <div class="d-flex gap-2">
+                    <button onclick="downloadGlobalCSV()" class="btn-primary" style="background:var(--success)">Export CSV</button>
+                    <button onclick="printToPDF()" class="btn-outline">Print Table to PDF</button>
+                    <button onclick="loadUsers()" class="btn-outline">Refresh Data</button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="glass-table" id="adminDataTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name & Email</th>
+                            <th>Role</th>
+                            <th>Platform Activity</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="oversightList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crisis Widget Top Banner -->
+    <div id="crisis-widget">
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span id="crisis-message">Crisis Alert System Active</span>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        const checkAuth = () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!token || user.role !== 'ADMIN') {
+                window.location.href = '/';
+            }
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('sidebarName').textContent = user.name;
+        };
+
+        const logout = () => {
+            localStorage.clear();
+            window.location.href = '/';
+        };
+
+        const switchTab = (tabId) => {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
+        const loadUsers = async () => {
+            const tbody = document.getElementById('oversightList');
+            tbody.innerHTML = '<tr><td colspan="5">Loading surveillance data...</td></tr>';
+            try {
+                const users = await apiFetch('/admin/users');
+                tbody.innerHTML = '';
+                if(users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5">No users found on platform.</td></tr>';
+                }
+                users.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="badge ${u.role === 'TEACHER' ? 'badge-primary' : 'badge-warning'}">${u.id}</span></td>
+                        <td><b>${u.name}</b><br><span style="font-size:0.8rem" class="text-slate">${u.email}</span></td>
+                        <td>${u.role}</td>
+                        <td>${u.activity_metric || 'No Data'}</td>
+                        <td>
+                            <button onclick="deleteUser('${u.id}')" class="btn-primary" style="background:var(--danger); padding:6px 12px; font-size:0.85rem">Ban / Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red">Failed to load platform data</td></tr>';
+                showToast(err.message, 'error');
+            }
+        };
+
+        const deleteUser = async (id) => {
+            if(!confirm(`WARNING: Are you sure you wish to ban user [${id}]? This will completely wipe all associated enrollments, grades, attendance, and data cascade.`)) return;
+            try {
+                await apiFetch(`/admin/users/${id}`, { method: 'DELETE' });
+                showToast(`User ${id} terminated successfully.`, 'success');
+                loadUsers();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        };
+
+        const downloadGlobalCSV = () => {
+            const token = localStorage.getItem('token');
+            fetch('/api/export/global', { headers: {'Authorization': `Bearer ${token}`} })
+            .then(res => {
+                if(!res.ok) throw new Error('Export failed');
+                return res.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Platform_Global_Report.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(e => showToast(e.message, 'error'));
+        };
+
+        const printToPDF = () => {
+            // Natively utilizes the browser's PDF Print dialogue scoped to the Table
+            const printContent = document.getElementById('adminDataTable').outerHTML;
+            const originalBody = document.body.innerHTML;
+            document.body.innerHTML = '<h2>Smart Class Admin Oversight Report</h2><br>' + printContent;
+            window.print();
+            // Restore actual app logic bypassing reload
+            document.body.innerHTML = originalBody;
+            window.location.reload(); // Hard reload to quickly snap listeners back safely into place post-print
+        };
+
+        document.getElementById('createTeacherForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                id: document.getElementById('teachId').value,
+                name: document.getElementById('teachName').value,
+                email: document.getElementById('teachEmail').value,
+                password: document.getElementById('teachPassword').value
+            };
+            try {
+                await apiFetch('/auth/register/teacher', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                showToast(`Teacher ${payload.name} [ID: ${payload.id}] Provisioned!`, 'success');
+                e.target.reset();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        checkAuth();
+        loadUsers();
+    </script>
+</body>
+</html>

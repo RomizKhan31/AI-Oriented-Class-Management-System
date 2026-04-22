@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Class Management | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="glass-panel login-card animate-fade-in">
+            <h1 class="nav-brand text-center mb-4">Smart Class</h1>
+
+            <div class="tabs-nav" style="justify-content: center; margin-bottom: 1rem;">
+                <button class="tab-btn active" onclick="switchAuthTab('loginTab')">Sign In</button>
+                <button class="tab-btn" onclick="switchAuthTab('registerTab')">Register Student</button>
+            </div>
+
+            <div id="loginTab" class="tab-pane active">
+                <p class="text-center text-slate mb-4">Login to access your dashboard</p>
+                <form id="loginForm">
+                    <input type="email" id="email" class="input-glass mb-4" placeholder="Email Address" required>
+                    <input type="password" id="password" class="input-glass mb-4" placeholder="Password" required>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+                <div class="text-center mt-4">
+                    <p class="text-slate">Demo Admin: a@demo.com</p>
+                    <p class="text-slate">Demo Teacher: t@demo.com</p>
+                    <p class="text-slate">Demo Student: s@demo.com</p>
+                    <p class="text-slate" style="font-size: 0.8rem">Password for all: password</p>
+                </div>
+            </div>
+
+            <div id="registerTab" class="tab-pane">
+                <p class="text-center text-slate mb-4">Create a new Student Account</p>
+                <form id="registerForm">
+                    <input type="text" id="regId" class="input-glass mb-4" placeholder="Custom Student ID (Optional)">
+                    <input type="text" id="regName" class="input-glass mb-4" placeholder="Full Name" required>
+                    <input type="email" id="regEmail" class="input-glass mb-4" placeholder="Email Address" required>
+                    <input type="password" id="regPassword" class="input-glass mb-4" placeholder="Password" required>
+                    <button type="submit" class="btn-primary">Sign Up as Student</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crisis Widget -->
+    <div id="crisis-widget">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 24px; height: 24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span id="crisis-message">Crisis Alert System Active</span>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

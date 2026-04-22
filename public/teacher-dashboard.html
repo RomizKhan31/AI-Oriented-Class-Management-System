@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Class Management | Teacher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="nav-brand">Smart Class</div>
+        <div class="d-flex align-center gap-2">
+            <span id="userName" class="text-slate"></span>
+            <button onclick="logout()" class="btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="glass-panel text-center mb-4">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">T</div>
+                <h3 id="sidebarName">Teacher</h3>
+                <span class="badge badge-success">Active Faculty</span>
+            </div>
+            
+            <div class="glass-panel">
+                <h4 class="mb-4">Create Element</h4>
+                
+                <h5 class="text-slate">Schedule Class</h5>
+                <form id="createClassForm" class="mb-4">
+                    <input type="text" id="classId" class="input-glass mb-4" placeholder="Custom Class ID (e.g. CS101)" required>
+                    <input type="text" id="className" class="input-glass mb-4" placeholder="Class Name" required>
+                    <input type="datetime-local" id="classTime" class="input-glass mb-4" required>
+                    <input type="url" id="classLink" class="input-glass mb-4" placeholder="Meeting Link (optional)">
+                    <button type="submit" class="btn-primary">Schedule Class</button>
+                </form>
+
+                <h5 class="text-slate mt-4">Create Advanced Exam</h5>
+                <form id="createExamForm">
+                    <input type="text" id="examId" class="input-glass mb-4" placeholder="Custom Exam ID (e.g. MID01)" required>
+                    <input type="text" id="examClassId" class="input-glass mb-4" placeholder="For Class ID" required>
+                    <input type="text" id="examTitle" class="input-glass mb-4" placeholder="Exam Title" required>
+                    <textarea id="examDetails" class="input-glass mb-4" placeholder="Exam Details / Instructions"></textarea>
+                    
+                    <label class="text-slate" style="display:block; text-align:left; margin-bottom: 5px;">Exam Material (PDF):</label>
+                    <input type="file" id="examFile" class="input-glass mb-4" accept=".pdf">
+                    
+                    <input type="number" id="examDuration" class="input-glass mb-4" placeholder="Duration (Minutes)" value="60">
+                    <button type="submit" class="btn-outline" style="width:100%">Create Exam</button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total Classes</span>
+                    <span id="totalClassesStat" class="stat-value">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Enrollments</span>
+                    <span id="totalStudentsStat" class="stat-value">0</span>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('classes-tab')">Classes & Attendance</button>
+                <button class="tab-btn" onclick="switchTab('academic-tab')">Academic & Marks</button>
+                <button class="tab-btn" onclick="switchTab('communication-tab')">Announcements</button>
+                <button class="tab-btn" onclick="switchTab('reports-tab')">Reports</button>
+            </div>
+
+            <!-- Tab: Classes -->
+            <div id="classes-tab" class="tab-pane active">
+                <div class="glass-panel">
+                    <div class="card-header">
+                        <span>Upcoming Classes</span>
+                        <button class="btn-outline" onclick="loadClasses()">Refresh</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>Class Name</th>
+                                    <th>Schedule</th>
+                                    <th>Link</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classesList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Attendance Modal -->
+                <div id="attendanceArea" class="glass-panel mt-4" style="display: none;">
+                    <div class="d-flex justify-between align-center border-bottom pb-2 mb-4">
+                        <span>Attendance for Class: <b id="attClassName"></b></span>
+                        <button class="btn-outline" onclick="closeAttendance()">Close</button>
+                    </div>
+                    <div class="mb-4 d-flex gap-2">
+                        <button class="btn-primary" style="background:var(--success)" onclick="markAllAttendance('PRESENT')">Mark All Present</button>
+                        <button class="btn-primary" style="background:var(--danger)" onclick="markAllAttendance('ABSENT')">Mark All Absent</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Academic -->
+            <div id="academic-tab" class="tab-pane">
+                <div class="glass-panel">
+                    <h4 class="mb-4">Assign Results</h4>
+                    <form id="assignResultForm" class="d-flex gap-2 mb-4" style="flex-wrap: wrap">
+                        <input type="number" id="resExamId" class="input-glass" style="flex:1" placeholder="Exam ID" required>
+                        <input type="number" id="resStudentId" class="input-glass" style="flex:1" placeholder="Student ID" required>
+                        <input type="number" step="0.01" id="resScore" class="input-glass" style="flex:1" placeholder="Score %" required>
+                        <button type="submit" class="btn-primary" style="flex:1">Save Mark</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab: Communication -->
+            <div id="communication-tab" class="tab-pane">
+                <div class="glass-panel mb-4">
+                    <h4 class="mb-4">Send Global Announcement</h4>
+                    <form id="announcementForm">
+                        <textarea id="announcementMessage" class="input-glass mb-4" rows="3" placeholder="Type your announcement here..." required></textarea>
+                        <button type="submit" class="btn-primary">Broadcast to All Students</button>
+                    </form>
+                </div>
+                
+                <div class="glass-panel">
+                    <h4 class="mb-4">Direct Messaging Inbox</h4>
+                    <button class="btn-outline mb-4" onclick="loadInbox()">Refresh Inbox</button>
+                    <div id="inboxList" style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Reports -->
+            <div id="reports-tab" class="tab-pane">
+                <div class="glass-panel text-center">
+                    <h4 class="mb-4">Export Academic & Attendance Report</h4>
+                    <p class="text-slate mb-4">Download a full comprehensive CSV report containing attendance statistics and all exam marks for a given class.</p>
+                    <div class="d-flex justify-center align-center gap-2" style="max-width:400px; margin: 0 auto;">
+                        <input type="text" id="exportClassId" class="input-glass" placeholder="Class ID">
+                        <button onclick="downloadReport()" class="btn-success btn-primary" style="background:var(--success)">Download CSV</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Crisis Widget Top Banner Redesign -->
+    <div id="crisis-widget">
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span id="crisis-message">Crisis Alert System Active</span>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        const checkAuth = () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!token || user.role !== 'TEACHER') {
+                window.location.href = '/';
+            }
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('sidebarName').textContent = user.name;
+        };
+
+        const logout = () => {
+            localStorage.clear();
+            window.location.href = '/';
+        };
+
+        const switchTab = (tabId) => {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
+        // --- CLASSES & ATTENDANCE ---
+        const loadClasses = async () => {
+            const tbody = document.getElementById('classesList');
+            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            try {
+                const classes = await apiFetch('/classes');
+                tbody.innerHTML = '';
+                
+                document.getElementById('totalClassesStat').textContent = classes.length;
+                let totalStudents = 0;
+
+                if (classes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No classes scheduled</td></tr>';
+                }
+                classes.forEach(c => {
+                    const studentCount = c.student_count || 0;
+                    totalStudents += parseInt(studentCount);
+                    const tr = document.createElement('tr');
+                    const time = new Date(c.schedule_time).toLocaleString();
+                    tr.innerHTML = `
+                        <td>
+                            <b>${c.name}</b><br>
+                            <span class="badge badge-warning" style="font-size:0.7rem">ID: ${c.id}</span>
+                            <span class="badge badge-success" style="font-size:0.7rem">${studentCount} Students</span>
+                        </td>
+                        <td>${time}</td>
+                        <td><a href="${c.meeting_link}" target="_blank" style="color: var(--primary)">Link</a></td>
+                        <td>
+                            <button class="btn-outline" onclick="openAttendance('${c.id}', '${c.name.replace(/'/g, "\\'")}')">Attendance</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                document.getElementById('totalStudentsStat').textContent = totalStudents;
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4" style="color:red">Failed to load classes</td></tr>';
+                showToast('Failed to load classes', 'error');
+            }
+        };
+
+        const openAttendance = async (classId, className) => {
+            document.getElementById('attendanceArea').style.display = 'block';
+            document.getElementById('attClassName').textContent = className;
+            window.currentClassId = classId;
+            const tbody = document.getElementById('attendanceList');
+            tbody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+            
+            try {
+                const attendance = await apiFetch(`/attendance/${classId}`);
+                tbody.innerHTML = '';
+                if(attendance.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3">No students have had attendance marked yet.</td></tr>';
+                }
+                
+                attendance.forEach(att => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${att.student_name}</td>
+                        <td><span class="badge ${att.status === 'PRESENT' ? 'badge-success' : 'badge-danger'}">${att.status}</span></td>
+                        <td>
+                            <select data-studentid="${att.student_id}" onchange="updateAttendance('${classId}', '${att.student_id}', this.value)" class="input-glass att-select" style="width: auto; padding: 4px;">
+                                <option value="PRESENT" ${att.status === 'PRESENT' ? 'selected' : ''}>Present</option>
+                                <option value="ABSENT" ${att.status === 'ABSENT' ? 'selected' : ''}>Absent</option>
+                            </select>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="3" style="color:red">Error loading attendance</td></tr>';
+            }
+        };
+
+        const updateAttendance = async (classId, studentId, status) => {
+            try {
+                await apiFetch('/attendance', {
+                    method: 'POST',
+                    body: JSON.stringify({ class_id: classId, student_id: studentId, status })
+                });
+                showToast('Attendance updated');
+            } catch (error) {
+                showToast('Update failed: ' + error.message, 'error');
+            }
+        };
+
+        const markAllAttendance = async (status) => {
+            if (!window.currentClassId) return;
+            try {
+                // To do this simply on frontend: Gather all selects, update them, and hit API iteratively
+                const selects = document.querySelectorAll('.att-select');
+                for(let select of selects) {
+                    select.value = status;
+                    const studentId = select.getAttribute('data-studentid');
+                    await apiFetch('/attendance', {
+                        method: 'POST',
+                        body: JSON.stringify({ class_id: window.currentClassId, student_id: studentId, status })
+                    });
+                }
+                showToast(`Successfully marked all students ${status}`, 'success');
+                // Reload attendance visually to get badges accurate
+                openAttendance(window.currentClassId, document.getElementById('attClassName').textContent);
+            } catch (e) {
+                showToast('Bulk update failed: ' + e.message, 'error');
+            }
+        };
+
+        const closeAttendance = () => {
+            document.getElementById('attendanceArea').style.display = 'none';
+        }
+
+        // --- FORMS ---
+        document.getElementById('createClassForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                id: document.getElementById('classId').value,
+                name: document.getElementById('className').value,
+                schedule_time: document.getElementById('classTime').value,
+                meeting_link: document.getElementById('classLink').value
+            };
+            try {
+                await apiFetch('/classes', { method: 'POST', body: JSON.stringify(payload) });
+                showToast('Class created successfully!');
+                e.target.reset();
+                loadClasses();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        document.getElementById('createExamForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('id', document.getElementById('examId').value);
+            formData.append('class_id', document.getElementById('examClassId').value);
+            formData.append('title', document.getElementById('examTitle').value);
+            formData.append('details', document.getElementById('examDetails').value);
+            formData.append('duration_minutes', document.getElementById('examDuration').value);
+            
+            const fileInput = document.getElementById('examFile');
+            if(fileInput.files[0]) {
+                formData.append('exam_file', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/api/academic/exams', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if(!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.message || 'Error executing request');
+                }
+                showToast('Exam created successfully! Physical PDF stored.');
+                e.target.reset();
+                loadClasses();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        document.getElementById('assignResultForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                exam_id: document.getElementById('resExamId').value,
+                student_id: document.getElementById('resStudentId').value,
+                score: document.getElementById('resScore').value
+            };
+            try {
+                await apiFetch('/academic/results', { method: 'POST', body: JSON.stringify(payload) });
+                showToast('Mark Assigned successfully!');
+                e.target.reset();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        document.getElementById('announcementForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = { message: document.getElementById('announcementMessage').value };
+            try {
+                await apiFetch('/communication/message', { method: 'POST', body: JSON.stringify(payload) });
+                showToast('Announcement broadcasted!');
+                e.target.reset();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        // --- COMMUNICATION ---
+        const loadInbox = async () => {
+            const list = document.getElementById('inboxList');
+            list.innerHTML = 'Loading messages...';
+            try {
+                const msgs = await apiFetch('/communication/inbox');
+                list.innerHTML = '';
+                if(msgs.length === 0) list.innerHTML = '<span class="text-slate">No messages found.</span>';
+                
+                msgs.forEach(m => {
+                    const el = document.createElement('div');
+                    el.style.borderLeft = m.receiver_id === null ? "4px solid var(--warning)" : "4px solid var(--primary)";
+                    el.style.padding = "10px";
+                    el.style.background = "rgba(255,255,255,0.05)";
+                    
+                    const time = new Date(m.timestamp).toLocaleString();
+                    el.innerHTML = `
+                        <div class="d-flex justify-between mb-2">
+                            <b>${m.sender_name} <span class="badge ${m.receiver_id === null ? 'badge-warning' : 'badge-success'}">${m.receiver_id === null ? 'Global' : 'Direct'}</span></b>
+                            <span class="text-slate" style="font-size:0.8rem">${time}</span>
+                        </div>
+                        <p style="margin:0">${m.message}</p>
+                    `;
+                    list.appendChild(el);
+                });
+            } catch (e) {
+                list.innerHTML = '<span style="color:red">Error loading inbox</span>';
+            }
+        }
+
+        // --- DATA EXPORT ---
+        const downloadReport = () => {
+            const cid = document.getElementById('exportClassId').value;
+            if(!cid) return showToast('Enter a Class ID first', 'error');
+            const token = localStorage.getItem('token');
+            // Trigger browser download by accessing route with query auth or fetch blob
+            fetch(`/api/export/class/${cid}`, { headers: {'Authorization': `Bearer ${token}`} })
+            .then(res => {
+                if(!res.ok) throw new Error('Failed to download report');
+                return res.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Class_${cid}_Report.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(e => showToast(e.message, 'error'));
+        };
+
+        checkAuth();
+        loadClasses();
+        loadInbox();
+    </script>
+</body>
+</html>

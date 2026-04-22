@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Class Management | Student</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="nav-brand">Smart Class</div>
+        <div class="d-flex align-center gap-2">
+            <span id="userName" class="text-slate"></span>
+            <button onclick="logout()" class="btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="glass-panel text-center mb-4">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--secondary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">S</div>
+                <h3 id="sidebarName">Student</h3>
+                <span class="badge badge-success">Enrolled</span>
+            </div>
+            
+            <div class="stats-grid" style="display:flex; flex-direction:column; gap:10px;">
+                <div class="stat-card" style="padding: 1rem;">
+                    <span class="stat-label">Enrolled Classes</span>
+                    <span id="totalEnrolledStat" class="stat-value" style="font-size: 1.8rem;">0</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Tabs Navigation -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('classes-tab')">My Classes</button>
+                <button class="tab-btn" onclick="switchTab('available-tab')">Available Classes</button>
+                <button class="tab-btn" onclick="switchTab('academic-tab')">Academic Center</button>
+                <button class="tab-btn" onclick="switchTab('communication-tab')">Inbox & Contact</button>
+            </div>
+
+            <!-- Tab: My Classes -->
+            <div id="classes-tab" class="tab-pane active">
+                <div class="glass-panel">
+                    <div class="card-header">
+                        <span>My Schedule</span>
+                        <button class="btn-outline" onclick="loadClasses()">Refresh Schedule</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>Class Name</th>
+                                    <th>Schedule</th>
+                                    <th>Link</th>
+                                    <th>Attendance Verification</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classesList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Available Classes -->
+            <div id="available-tab" class="tab-pane">
+                <div class="glass-panel mb-4">
+                    <div class="card-header">
+                        <span>Available Classes to Enroll</span>
+                        <button class="btn-outline" onclick="loadAllClasses()">Refresh List</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>Class Name & ID</th>
+                                    <th>Teacher</th>
+                                    <th>Schedule</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allClassesList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Academic Center -->
+            <div id="academic-tab" class="tab-pane">
+                
+                <!-- Live Exams Modal Component -->
+                <div id="examModal" class="glass-panel mb-4" style="display: none; border-left: 4px solid var(--danger);">
+                    <div class="d-flex justify-between align-center mb-4">
+                        <h3 id="liveExamTitle" class="text-slate">Active Exam Session</h3>
+                        <div style="background: rgba(220, 38, 38, 0.2); color:white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1.2rem;">
+                            Time Remaining: <span id="examTimer">00:00</span>
+                        </div>
+                    </div>
+                    <p id="liveExamInstructions" class="text-slate mb-4"></p>
+                    <a id="liveExamLink" href="#" target="_blank" class="btn-primary" style="display: inline-block; text-align: center; background: var(--danger)">Open Exam Material</a>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="card-header">
+                        <span>My Exams & Performance</span>
+                        <button class="btn-outline" onclick="loadPerformance()">Refresh</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Exam Title</th>
+                                    <th>Exam ID</th>
+                                    <th>Status / Score</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performanceList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Communication -->
+            <div id="communication-tab" class="tab-pane">
+                <div class="glass-panel mb-4">
+                    <h4 class="mb-4">Message A Teacher</h4>
+                    <form id="sendMessageForm">
+                        <input type="number" id="msgTeacherId" class="input-glass mb-4" placeholder="Teacher User ID" required>
+                        <textarea id="msgContent" class="input-glass mb-4" rows="3" placeholder="Type your message..." required></textarea>
+                        <button type="submit" class="btn-primary">Send Message</button>
+                    </form>
+                </div>
+
+                <div class="glass-panel">
+                    <h4 class="mb-4">My Inbox</h4>
+                    <button class="btn-outline mb-4" onclick="loadInbox()">Refresh Inbox</button>
+                    <div id="inboxList" style="display:flex; flex-direction:column; gap:10px;">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Crisis Widget Top Banner -->
+    <div id="crisis-widget">
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span id="crisis-message">Crisis Alert System Active</span>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        const checkAuth = () => {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!token || user.role !== 'STUDENT') {
+                window.location.href = '/';
+            }
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('sidebarName').textContent = user.name;
+        };
+
+        const logout = () => {
+            localStorage.clear();
+            window.location.href = '/';
+        };
+
+        const switchTab = (tabId) => {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
+        let myEnrolledClassIds = [];
+
+        const enroll = async (class_id) => {
+            try {
+                await apiFetch('/classes/enroll', {
+                    method: 'POST',
+                    body: JSON.stringify({ class_id })
+                });
+                showToast('Enrolled successfully!');
+                await loadClasses();
+                await loadAllClasses();
+            } catch(e) {
+                showToast(e.message, 'error');
+            }
+        };
+
+        const loadClasses = async () => {
+            const tbody = document.getElementById('classesList');
+            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            try {
+                const classes = await apiFetch('/classes');
+                tbody.innerHTML = '';
+                
+                myEnrolledClassIds = classes.map(c => c.id);
+                document.getElementById('totalEnrolledStat').textContent = classes.length;
+
+                if (classes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">Not enrolled in any classes</td></tr>';
+                }
+                
+                for(let c of classes) {
+                    const time = new Date(c.schedule_time).toLocaleString();
+                    const tr = document.createElement('tr');
+                    
+                    let attStatus = 'Pending';
+                    try {
+                        const attData = await apiFetch(`/attendance/${c.id}`);
+                        if(attData.length > 0) {
+                            attStatus = `<span class="badge ${attData[0].status === 'PRESENT' ? 'badge-success' : 'badge-danger'}">${attData[0].status}</span>`;
+                        } else {
+                            attStatus = `<span class="badge" style="background: rgba(255,255,255,0.1); color: var(--warning)">Awaiting Teacher</span>`;
+                        }
+                    } catch(e) {}
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <b>${c.name}</b><br>
+                            <span class="text-slate" style="font-size:0.8rem">Teacher: ${c.teacher_name}</span>
+                        </td>
+                        <td>${time}</td>
+                        <td><a href="${c.meeting_link}" target="_blank" style="color: var(--secondary)">Join Meet</a></td>
+                        <td>${attStatus}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4" style="color:red">Failed to load schedule</td></tr>';
+                showToast('Failed to load classes', 'error');
+            }
+        };
+
+        const loadAllClasses = async () => {
+            const tbody = document.getElementById('allClassesList');
+            tbody.innerHTML = '<tr><td colspan="4">Loading available classes...</td></tr>';
+            try {
+                const classes = await apiFetch('/classes/all');
+                tbody.innerHTML = '';
+                
+                if (classes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No classes exist yet!</td></tr>';
+                }
+                
+                for(let c of classes) {
+                    // Skip if already enrolled
+                    if (myEnrolledClassIds.includes(c.id)) {
+                        continue;
+                    }
+
+                    const time = new Date(c.schedule_time).toLocaleString();
+                    const tr = document.createElement('tr');
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <b>${c.name}</b>
+                            <span class="badge badge-warning" style="font-size:0.7rem; margin-left: 8px;">ID: ${c.id}</span>
+                        </td>
+                        <td>${c.teacher_name} (User ID: ${c.teacher_id})</td>
+                        <td>${time}</td>
+                        <td>
+                            <button onclick="enroll('${c.id}')" class="btn-primary" style="padding: 6px 12px; font-size: 0.9rem;">Quick Enroll</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+                
+                if(tbody.innerHTML === '') {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">You have enrolled in all available classes! 🎉</td></tr>';
+                }
+
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4" style="color:red">Failed to load classes list</td></tr>';
+            }
+        };
+
+        const loadPerformance = async () => {
+            const tbody = document.getElementById('performanceList');
+            tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+            try {
+                const data = await apiFetch('/academic/performance');
+                tbody.innerHTML = '';
+                
+                if(data.exams.length === 0 && data.attendance.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5">No academic records found.</td></tr>';
+                    return;
+                }
+                
+                // Render Exams
+                data.exams.forEach(p => {
+                    const tr = document.createElement('tr');
+                    
+                    let statusHtml = '';
+                    let actionHtml = '';
+                    
+                    if (p.score !== null && p.score !== undefined) {
+                        let badge = p.score > 50 ? 'badge-success' : 'badge-danger';
+                        statusHtml = `<span class="badge ${badge}">${p.score}%</span>`;
+                        actionHtml = `<span class="text-slate">Graded</span>`;
+                    } else {
+                        statusHtml = `<span class="badge badge-warning">Pending Grade</span>`;
+                        const safeTitle = (p.exam_title || '').replace(/'/g, "\\'");
+                        const safeContent = (p.exam_content || '').replace(/'/g, "\\'");
+                        actionHtml = `<button onclick="startExam('${safeTitle}', ${p.duration_minutes || 60}, '${safeContent}')" class="btn-outline" style="color:var(--warning); border-color:var(--warning)">Take Exam</button>`;
+                    }
+
+                    // Look up attendance for this class
+                    let attPct = 'N/A';
+                    const attObj = data.attendance.find(a => a.class_name === p.class_name);
+                    if(attObj) {
+                        let attBadge = attObj.percentage >= 75 ? 'badge-primary' : 'badge-danger';
+                        attPct = `<span class="badge ${attBadge}">${attObj.percentage}% Attendance</span>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td><b>${p.class_name}</b><br>${attPct}</td>
+                        <td>${p.exam_title}</td>
+                        <td><span class="badge badge-warning">ID: ${p.exam_id}</span></td>
+                        <td>${statusHtml}</td>
+                        <td>${actionHtml}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red">Failed to load performance</td></tr>';
+                showToast(e.message, 'error');
+            }
+        };
+
+        let examInterval;
+        const startExam = (title, durationMinutes, contentLink) => {
+            clearInterval(examInterval);
+            document.getElementById('examModal').style.display = 'block';
+            document.getElementById('liveExamTitle').textContent = `Live: ${title}`;
+            document.getElementById('liveExamLink').href = contentLink;
+            if (!contentLink) document.getElementById('liveExamLink').style.display = 'none';
+            else document.getElementById('liveExamLink').style.display = 'inline-block';
+            
+            let timeRemaining = durationMinutes * 60;
+            const timerEl = document.getElementById('examTimer');
+            
+            const updateTimer = () => {
+                const mins = Math.floor(timeRemaining / 60);
+                const secs = timeRemaining % 60;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(examInterval);
+                    timerEl.textContent = "00:00";
+                    alert("⚠️ TIME IS UP! EXAM HAS CONCLUDED!");
+                    document.getElementById('examModal').style.display = 'none';
+                }
+                timeRemaining--;
+            };
+            
+            updateTimer();
+            examInterval = setInterval(updateTimer, 1000);
+            
+            // Scroll to top to see exam
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = { 
+                receiver_id: document.getElementById('msgTeacherId').value,
+                message: document.getElementById('msgContent').value 
+            };
+            try {
+                await apiFetch('/communication/message', { method: 'POST', body: JSON.stringify(payload) });
+                showToast('Message Sent successfully!');
+                e.target.reset();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        const loadInbox = async () => {
+            const list = document.getElementById('inboxList');
+            list.innerHTML = 'Loading messages...';
+            try {
+                const msgs = await apiFetch('/communication/inbox');
+                list.innerHTML = '';
+                if(msgs.length === 0) list.innerHTML = '<span class="text-slate">No messages found.</span>';
+                
+                msgs.forEach(m => {
+                    const el = document.createElement('div');
+                    el.style.borderLeft = m.receiver_id === null ? "4px solid var(--warning)" : "4px solid var(--primary)";
+                    el.style.padding = "10px";
+                    el.style.background = "rgba(255,255,255,0.05)";
+                    
+                    const time = new Date(m.timestamp).toLocaleString();
+                    el.innerHTML = `
+                        <div class="d-flex justify-between mb-2">
+                            <b>${m.sender_name} <span class="badge ${m.receiver_id === null ? 'badge-warning' : 'badge-success'}">${m.receiver_id === null ? 'Global' : 'Direct'}</span></b>
+                            <span class="text-slate" style="font-size:0.8rem">${time}</span>
+                        </div>
+                        <p style="margin:0">${m.message}</p>
+                    `;
+                    list.appendChild(el);
+                });
+            } catch (e) {
+                list.innerHTML = '<span style="color:red">Error loading inbox</span>';
+            }
+        }
+
+        const initLoad = async () => {
+            checkAuth();
+            await loadClasses(); 
+            await loadAllClasses();
+            await loadPerformance();
+            await loadInbox();
+        };
+
+        initLoad();
+    </script>
+</body>
+</html>
