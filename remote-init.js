@@ -7,14 +7,17 @@ async function initRemoteDB() {
     console.log('Connecting to remote database at:', process.env.DB_HOST);
     try {
         // Connect directly to the specific database provisioned by Aiven
-        const pool = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            port: process.env.DB_PORT || 3306,
-            ssl: { rejectUnauthorized: false } // Required for Aiven managed databases
-        });
+        const connectionConfig = process.env.DATABASE_URL
+            ? process.env.DATABASE_URL
+            : {
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME,
+                port: process.env.DB_PORT || 3306,
+                ssl: { rejectUnauthorized: false } // Required for some managed databases
+            };
+        const pool = await mysql.createConnection(connectionConfig);
 
         // The tables to create
         const tablesSql = `
