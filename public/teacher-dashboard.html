@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
 </head>
+
 <body>
     <nav class="glass-nav">
-        <div class="nav-brand">Smart Class</div>
+        <div class="nav-brand">AI Class Management System</div>
         <div class="d-flex align-center gap-2">
             <span id="userName" class="text-slate"></span>
             <button onclick="logout()" class="btn-outline">Logout</button>
@@ -20,17 +22,20 @@
         <!-- Sidebar -->
         <aside>
             <div class="glass-panel text-center mb-4">
-                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">T</div>
+                <div
+                    style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">
+                    T</div>
                 <h3 id="sidebarName">Teacher</h3>
                 <span class="badge badge-success">Active Faculty</span>
             </div>
-            
+
             <div class="glass-panel">
                 <h4 class="mb-4">Create Element</h4>
-                
+
                 <h5 class="text-slate">Schedule Class</h5>
                 <form id="createClassForm" class="mb-4">
-                    <input type="text" id="classId" class="input-glass mb-4" placeholder="Custom Class ID (e.g. CS101)" required>
+                    <input type="text" id="classId" class="input-glass mb-4" placeholder="Custom Class ID (e.g. CS101)"
+                        required>
                     <input type="text" id="className" class="input-glass mb-4" placeholder="Class Name" required>
                     <input type="datetime-local" id="classTime" class="input-glass mb-4" required>
                     <input type="url" id="classLink" class="input-glass mb-4" placeholder="Meeting Link (optional)">
@@ -39,15 +44,19 @@
 
                 <h5 class="text-slate mt-4">Create Advanced Exam</h5>
                 <form id="createExamForm">
-                    <input type="text" id="examId" class="input-glass mb-4" placeholder="Custom Exam ID (e.g. MID01)" required>
+                    <input type="text" id="examId" class="input-glass mb-4" placeholder="Custom Exam ID (e.g. MID01)"
+                        required>
                     <input type="text" id="examClassId" class="input-glass mb-4" placeholder="For Class ID" required>
                     <input type="text" id="examTitle" class="input-glass mb-4" placeholder="Exam Title" required>
-                    <textarea id="examDetails" class="input-glass mb-4" placeholder="Exam Details / Instructions"></textarea>
-                    
-                    <label class="text-slate" style="display:block; text-align:left; margin-bottom: 5px;">Exam Material (PDF):</label>
+                    <textarea id="examDetails" class="input-glass mb-4"
+                        placeholder="Exam Details / Instructions"></textarea>
+
+                    <label class="text-slate" style="display:block; text-align:left; margin-bottom: 5px;">Exam Material
+                        (PDF):</label>
                     <input type="file" id="examFile" class="input-glass mb-4" accept=".pdf">
-                    
-                    <input type="number" id="examDuration" class="input-glass mb-4" placeholder="Duration (Minutes)" value="60">
+
+                    <input type="number" id="examDuration" class="input-glass mb-4" placeholder="Duration (Minutes)"
+                        value="60">
                     <button type="submit" class="btn-outline" style="width:100%">Create Exam</button>
                 </form>
             </div>
@@ -103,8 +112,10 @@
                         <button class="btn-outline" onclick="closeAttendance()">Close</button>
                     </div>
                     <div class="mb-4 d-flex gap-2">
-                        <button class="btn-primary" style="background:var(--success)" onclick="markAllAttendance('PRESENT')">Mark All Present</button>
-                        <button class="btn-primary" style="background:var(--danger)" onclick="markAllAttendance('ABSENT')">Mark All Absent</button>
+                        <button class="btn-primary" style="background:var(--success)"
+                            onclick="markAllAttendance('PRESENT')">Mark All Present</button>
+                        <button class="btn-primary" style="background:var(--danger)"
+                            onclick="markAllAttendance('ABSENT')">Mark All Absent</button>
                     </div>
                     <div style="overflow-x: auto;">
                         <table class="glass-table">
@@ -126,9 +137,12 @@
                 <div class="glass-panel">
                     <h4 class="mb-4">Assign Results</h4>
                     <form id="assignResultForm" class="d-flex gap-2 mb-4" style="flex-wrap: wrap">
-                        <input type="number" id="resExamId" class="input-glass" style="flex:1" placeholder="Exam ID" required>
-                        <input type="number" id="resStudentId" class="input-glass" style="flex:1" placeholder="Student ID" required>
-                        <input type="number" step="0.01" id="resScore" class="input-glass" style="flex:1" placeholder="Score %" required>
+                        <input type="number" id="resExamId" class="input-glass" style="flex:1" placeholder="Exam ID"
+                            required>
+                        <input type="number" id="resStudentId" class="input-glass" style="flex:1"
+                            placeholder="Student ID" required>
+                        <input type="number" step="0.01" id="resScore" class="input-glass" style="flex:1"
+                            placeholder="Score %" required>
                         <button type="submit" class="btn-primary" style="flex:1">Save Mark</button>
                     </form>
                 </div>
@@ -139,11 +153,12 @@
                 <div class="glass-panel mb-4">
                     <h4 class="mb-4">Send Global Announcement</h4>
                     <form id="announcementForm">
-                        <textarea id="announcementMessage" class="input-glass mb-4" rows="3" placeholder="Type your announcement here..." required></textarea>
+                        <textarea id="announcementMessage" class="input-glass mb-4" rows="3"
+                            placeholder="Type your announcement here..." required></textarea>
                         <button type="submit" class="btn-primary">Broadcast to All Students</button>
                     </form>
                 </div>
-                
+
                 <div class="glass-panel">
                     <h4 class="mb-4">Direct Messaging Inbox</h4>
                     <button class="btn-outline mb-4" onclick="loadInbox()">Refresh Inbox</button>
@@ -157,10 +172,12 @@
             <div id="reports-tab" class="tab-pane">
                 <div class="glass-panel text-center">
                     <h4 class="mb-4">Export Academic & Attendance Report</h4>
-                    <p class="text-slate mb-4">Download a full comprehensive CSV report containing attendance statistics and all exam marks for a given class.</p>
+                    <p class="text-slate mb-4">Download a full comprehensive CSV report containing attendance statistics
+                        and all exam marks for a given class.</p>
                     <div class="d-flex justify-center align-center gap-2" style="max-width:400px; margin: 0 auto;">
                         <input type="text" id="exportClassId" class="input-glass" placeholder="Class ID">
-                        <button onclick="downloadReport()" class="btn-success btn-primary" style="background:var(--success)">Download CSV</button>
+                        <button onclick="downloadReport()" class="btn-success btn-primary"
+                            style="background:var(--success)">Download CSV</button>
                     </div>
                 </div>
             </div>
@@ -170,8 +187,10 @@
 
     <!-- Crisis Widget Top Banner Redesign -->
     <div id="crisis-widget">
-        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+            style="width: 28px; height: 28px;">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <span id="crisis-message">Crisis Alert System Active</span>
     </div>
@@ -207,7 +226,7 @@
             try {
                 const classes = await apiFetch('/classes');
                 tbody.innerHTML = '';
-                
+
                 document.getElementById('totalClassesStat').textContent = classes.length;
                 let totalStudents = 0;
 
@@ -233,7 +252,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
-                
+
                 document.getElementById('totalStudentsStat').textContent = totalStudents;
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="4" style="color:red">Failed to load classes</td></tr>';
@@ -247,14 +266,14 @@
             window.currentClassId = classId;
             const tbody = document.getElementById('attendanceList');
             tbody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
-            
+
             try {
                 const attendance = await apiFetch(`/attendance/${classId}`);
                 tbody.innerHTML = '';
-                if(attendance.length === 0) {
+                if (attendance.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="3">No students have had attendance marked yet.</td></tr>';
                 }
-                
+
                 attendance.forEach(att => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -269,7 +288,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch(e) {
+            } catch (e) {
                 tbody.innerHTML = '<tr><td colspan="3" style="color:red">Error loading attendance</td></tr>';
             }
         };
@@ -291,7 +310,7 @@
             try {
                 // To do this simply on frontend: Gather all selects, update them, and hit API iteratively
                 const selects = document.querySelectorAll('.att-select');
-                for(let select of selects) {
+                for (let select of selects) {
                     select.value = status;
                     const studentId = select.getAttribute('data-studentid');
                     await apiFetch('/attendance', {
@@ -339,9 +358,9 @@
             formData.append('title', document.getElementById('examTitle').value);
             formData.append('details', document.getElementById('examDetails').value);
             formData.append('duration_minutes', document.getElementById('examDuration').value);
-            
+
             const fileInput = document.getElementById('examFile');
-            if(fileInput.files[0]) {
+            if (fileInput.files[0]) {
                 formData.append('exam_file', fileInput.files[0]);
             }
 
@@ -351,7 +370,7 @@
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
-                if(!response.ok) {
+                if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.message || 'Error executing request');
                 }
@@ -398,14 +417,14 @@
             try {
                 const msgs = await apiFetch('/communication/inbox');
                 list.innerHTML = '';
-                if(msgs.length === 0) list.innerHTML = '<span class="text-slate">No messages found.</span>';
-                
+                if (msgs.length === 0) list.innerHTML = '<span class="text-slate">No messages found.</span>';
+
                 msgs.forEach(m => {
                     const el = document.createElement('div');
                     el.style.borderLeft = m.receiver_id === null ? "4px solid var(--warning)" : "4px solid var(--primary)";
                     el.style.padding = "10px";
                     el.style.background = "rgba(255,255,255,0.05)";
-                    
+
                     const time = new Date(m.timestamp).toLocaleString();
                     el.innerHTML = `
                         <div class="d-flex justify-between mb-2">
@@ -424,24 +443,24 @@
         // --- DATA EXPORT ---
         const downloadReport = () => {
             const cid = document.getElementById('exportClassId').value;
-            if(!cid) return showToast('Enter a Class ID first', 'error');
+            if (!cid) return showToast('Enter a Class ID first', 'error');
             const token = localStorage.getItem('token');
             // Trigger browser download by accessing route with query auth or fetch blob
-            fetch(`/api/export/class/${cid}`, { headers: {'Authorization': `Bearer ${token}`} })
-            .then(res => {
-                if(!res.ok) throw new Error('Failed to download report');
-                return res.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Class_${cid}_Report.csv`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-            .catch(e => showToast(e.message, 'error'));
+            fetch(`/api/export/class/${cid}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to download report');
+                    return res.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Class_${cid}_Report.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(e => showToast(e.message, 'error'));
         };
 
         checkAuth();
@@ -449,4 +468,5 @@
         loadInbox();
     </script>
 </body>
+
 </html>
