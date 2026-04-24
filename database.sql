@@ -6,8 +6,10 @@ CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    role ENUM('ADMIN', 'STUDENT', 'TEACHER') NOT NULL
+    password_hash VARCHAR(255) NULL,
+    role ENUM('ADMIN', 'STUDENT', 'TEACHER') NOT NULL,
+    auth_provider VARCHAR(50) DEFAULT 'LOCAL',
+    provider_id VARCHAR(255) NULL
 );
 
 CREATE TABLE IF NOT EXISTS classes (

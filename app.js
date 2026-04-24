@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -11,7 +12,20 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+const session = require('express-session');
+const passport = require('passport');
+require('./config/passport');
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+    secret: process.env.JWT_SECRET || 'secret',
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/classes', require('./routes/classes'));

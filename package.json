@@ -13,10 +13,14 @@
     "dotenv": "^17.4.2",
     "express": "~4.16.1",
     "express-async-handler": "^1.2.0",
+    "express-session": "^1.19.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "~1.9.1",
     "multer": "^2.1.1",
     "mysql2": "^3.22.0",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
     "pdfkit-table": "^0.1.99",
     "xlsx": "^0.18.5"
   }

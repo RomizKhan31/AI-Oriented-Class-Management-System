@@ -65,6 +65,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Check for OAuth token or error in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthToken = urlParams.get('token');
+    const oauthError = urlParams.get('error');
+
+    if (oauthError) {
+        if (typeof showToast === 'function') showToast('Authentication Failed', 'error');
+        window.history.replaceState({}, document.title, "/");
+    }
+
+    if (oauthToken) {
+        try {
+            const payload = JSON.parse(atob(oauthToken.split('.')[1]));
+            localStorage.setItem('token', oauthToken);
+            localStorage.setItem('user', JSON.stringify({
+                id: payload.id,
+                name: payload.name,
+                email: payload.email,
+                role: payload.role
+            }));
+            window.history.replaceState({}, document.title, "/");
+        } catch (e) {
+            console.error("Invalid OAuth token", e);
+        }
+    }
+
     // Check if already logged in
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
