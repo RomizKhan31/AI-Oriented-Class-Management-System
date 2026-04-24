@@ -1,158 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Class Management | Student</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/jpeg" href="/img/favicon.jpg">
     <link rel="stylesheet" href="/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <nav class="glass-nav">
-        <div class="nav-brand">Smart Class</div>
-        <div class="d-flex align-center gap-2">
-            <span id="userName" class="text-slate"></span>
-            <button onclick="logout()" class="btn-outline">Logout</button>
-        </div>
-    </nav>
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside>
-            <div class="glass-panel text-center mb-4">
-                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--secondary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">S</div>
-                <h3 id="sidebarName">Student</h3>
-                <span class="badge badge-success">Enrolled</span>
-            </div>
-            
-            <div class="stats-grid" style="display:flex; flex-direction:column; gap:10px;">
-                <div class="stat-card" style="padding: 1rem;">
-                    <span class="stat-label">Enrolled Classes</span>
-                    <span id="totalEnrolledStat" class="stat-value" style="font-size: 1.8rem;">0</span>
+    <div class="app-layout">
+        <!-- Mobile Drawer -->
+        <nav class="mobile-drawer" id="mobileDrawer">
+            <div class="drawer-header">
+                <div class="nav-brand" style="font-size: 1.2rem;">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:24px; height:24px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Smart Class
                 </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main>
-            <!-- Tabs Navigation -->
-            <div class="tabs-nav">
-                <button class="tab-btn active" onclick="switchTab('classes-tab')">My Classes</button>
-                <button class="tab-btn" onclick="switchTab('available-tab')">Available Classes</button>
-                <button class="tab-btn" onclick="switchTab('academic-tab')">Academic Center</button>
-                <button class="tab-btn" onclick="switchTab('communication-tab')">Inbox & Contact</button>
+                <button class="drawer-close" onclick="toggleDrawer()">×</button>
             </div>
 
-            <!-- Tab: My Classes -->
-            <div id="classes-tab" class="tab-pane active">
-                <div class="glass-panel">
-                    <div class="card-header">
-                        <span>My Schedule</span>
-                        <button class="btn-outline" onclick="loadClasses()">Refresh Schedule</button>
+            <div class="text-center mb-4">
+                <div
+                    style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;">
+                    S
+                </div>
+                <h4 id="sidebarName">Student</h4>
+                <span class="badge badge-success" style="font-size: 0.7rem;">Enrolled</span>
+            </div>
+
+            <div class="drawer-nav">
+                <button class="drawer-item active" onclick="switchDrawerTab('classes-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                    </svg>
+                    My Classes
+                </button>
+                <button class="drawer-item" onclick="switchDrawerTab('available-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Available Classes
+                </button>
+                <button class="drawer-item" onclick="switchDrawerTab('academic-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Academic Center
+                </button>
+                <button class="drawer-item" onclick="switchDrawerTab('communication-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    Inbox & Contact
+                </button>
+                <button class="drawer-item" onclick="switchDrawerTab('profile-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Profile
+                </button>
+                <div style="flex-grow: 1;"></div>
+                <button class="drawer-item" onclick="logout()" style="color: var(--danger); margin-top: auto;">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <nav class="glass-nav" style="justify-content: space-between;">
+                <div class="nav-brand" style="display:flex; margin-left:0;" id="desktopBrand">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:24px; height:24px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Student Portal
+                </div>
+
+                <div class="d-flex align-center gap-3" style="margin-left:auto;">
+                    <!-- Desktop Actions -->
+                    <div class="d-none d-md-flex align-center gap-3">
+                        <span id="userName" class="text-slate" style="font-weight: 600;"></span>
+                        <button onclick="logout()" class="btn-outline" style="padding: 8px 16px;">Logout</button>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table class="glass-table">
-                            <thead>
-                                <tr>
-                                    <th>Class Name</th>
-                                    <th>Schedule</th>
-                                    <th>Link</th>
-                                    <th>Attendance Verification</th>
-                                </tr>
-                            </thead>
-                            <tbody id="classesList"></tbody>
-                        </table>
+                    <!-- Mobile Toggle -->
+                    <button class="menu-toggle" onclick="toggleDrawer()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                            style="width: 28px; height: 28px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="dashboard-container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Enrolled Classes</span>
+                        <span id="totalEnrolledStat" class="stat-value text-secondary"
+                            style="font-size: 2.2rem;">0</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tab: Available Classes -->
-            <div id="available-tab" class="tab-pane">
-                <div class="glass-panel mb-4">
-                    <div class="card-header">
-                        <span>Available Classes to Enroll</span>
-                        <button class="btn-outline" onclick="loadAllClasses()">Refresh List</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="glass-table">
-                            <thead>
-                                <tr>
-                                    <th>Class Name & ID</th>
-                                    <th>Teacher</th>
-                                    <th>Schedule</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="allClassesList"></tbody>
-                        </table>
-                    </div>
+                <!-- Desktop Tabs (Fallback/Visual representation) -->
+                <div class="tabs-nav" style="justify-content: center; justify-self: center;">
+                    <button class="tab-btn active" onclick="switchTab('classes-tab')">My Classes</button>
+                    <button class="tab-btn" onclick="switchTab('available-tab')">Available Classes</button>
+                    <button class="tab-btn" onclick="switchTab('academic-tab')">Academic Center</button>
+                    <button class="tab-btn" onclick="switchTab('communication-tab')">Inbox & Contact</button>
+                    <button class="tab-btn" onclick="switchTab('profile-tab')">Profile</button>
                 </div>
-            </div>
 
-            <!-- Tab: Academic Center -->
-            <div id="academic-tab" class="tab-pane">
-                
-                <!-- Live Exams Modal Component -->
-                <div id="examModal" class="glass-panel mb-4" style="display: none; border-left: 4px solid var(--danger);">
-                    <div class="d-flex justify-between align-center mb-4">
-                        <h3 id="liveExamTitle" class="text-slate">Active Exam Session</h3>
-                        <div style="background: rgba(220, 38, 38, 0.2); color:white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1.2rem;">
-                            Time Remaining: <span id="examTimer">00:00</span>
+                <!-- Tab: My Classes -->
+                <div id="classes-tab" class="tab-pane active">
+                    <div class="card">
+                        <div class="card-header border-bottom pb-2 mb-4 d-flex justify-between align-center"
+                            style="border-bottom: 1px solid rgba(255,255,255,0.1)">
+                            <span style="margin: 0; font-size: 1.3rem;">My Schedule</span>
+                            <button class="btn-outline" style="padding: 6px 12px; font-size: 0.9rem;"
+                                onclick="loadClasses()">Refresh Schedule</button>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Class Name</th>
+                                        <th>Schedule</th>
+                                        <th>Link</th>
+                                        <th>Attendance Verification</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="classesList"></tbody>
+                            </table>
                         </div>
                     </div>
-                    <p id="liveExamInstructions" class="text-slate mb-4"></p>
-                    <a id="liveExamLink" href="#" target="_blank" class="btn-primary" style="display: inline-block; text-align: center; background: var(--danger)">Open Exam Material</a>
                 </div>
 
-                <div class="glass-panel">
-                    <div class="card-header">
-                        <span>My Exams & Performance</span>
-                        <button class="btn-outline" onclick="loadPerformance()">Refresh</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="glass-table">
-                            <thead>
-                                <tr>
-                                    <th>Class</th>
-                                    <th>Exam Title</th>
-                                    <th>Exam ID</th>
-                                    <th>Status / Score</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="performanceList"></tbody>
-                        </table>
+                <!-- Tab: Available Classes -->
+                <div id="available-tab" class="tab-pane">
+                    <div class="card mb-4">
+                        <div class="card-header border-bottom pb-2 mb-4 d-flex justify-between align-center"
+                            style="border-bottom: 1px solid rgba(255,255,255,0.1)">
+                            <span style="margin: 0; font-size: 1.3rem;">Available Classes to Enroll</span>
+                            <button class="btn-outline" style="padding: 6px 12px; font-size: 0.9rem;"
+                                onclick="loadAllClasses()">Refresh List</button>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Class Name & ID</th>
+                                        <th>Teacher</th>
+                                        <th>Schedule</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allClassesList"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Tab: Academic Center -->
+                <div id="academic-tab" class="tab-pane">
+
+                    <!-- Live Exams Modal Component -->
+                    <div id="examModal" class="card mb-4"
+                        style="display: none; border-left: 4px solid var(--danger); box-shadow: 0 10px 25px rgba(220,38,38,0.2);">
+                        <div class="d-flex justify-between align-center mb-4 pb-3"
+                            style="border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 1rem;">
+                            <h3 id="liveExamTitle" class="text-slate" style="margin:0; font-size: 1.5rem; color:white;">
+                                Active Exam Session</h3>
+                            <div
+                                style="background: linear-gradient(135deg, var(--danger), #991b1b); color:white; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(220,38,38,0.3);">
+                                Time Remaining: <span id="examTimer" style="font-family: monospace;">00:00</span>
+                            </div>
+                        </div>
+                        <p id="liveExamInstructions" class="text-slate mb-4"></p>
+                        <div id="liveExamContentContainer" class="mb-4"></div>
+
+                        <div class="mb-4 p-3"
+                            style="background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.2);">
+                            <label class="text-slate mb-2" style="display:block; font-weight:600;">Upload Exam Script
+                                (PDF)</label>
+                            <input type="file" id="examScriptInput" class="input-glass" accept=".pdf"
+                                style="width: 100%;">
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button onclick="submitExamAttempt()" class="btn-primary"
+                                style="background: linear-gradient(135deg, var(--success), #047857); width:auto; padding: 10px 24px; font-size: 1rem;">End
+                                & Submit Attempt</button>
+                            <button onclick="cancelExam()" class="btn-outline"
+                                style="width:auto; padding: 10px 24px; font-size: 1rem;">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="card mb-4" style="height: 100%;">
+                            <h4 class="mb-4 text-center">Performance Overview</h4>
+                            <div style="height: 300px; width: 100%;">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card" style="height: 100%;">
+                            <div class="card-header border-bottom pb-2 mb-4 d-flex justify-between align-center"
+                                style="border-bottom: 1px solid rgba(255,255,255,0.1)">
+                                <span style="margin: 0; font-size: 1.3rem;">My Exams & Performance</span>
+                                <button class="btn-outline" style="padding: 6px 12px; font-size: 0.9rem;"
+                                    onclick="loadPerformance()">Refresh</button>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table class="glass-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Class</th>
+                                            <th>Exam Title</th>
+                                            <th>Exam ID</th>
+                                            <th>Status / Score</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="performanceList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Communication -->
+                <div id="communication-tab" class="tab-pane">
+                    <div class="chat-container" style="max-width: 900px; margin: 0 auto;">
+                        <div class="chat-header">
+                            <div
+                                style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--success), #047857); display:flex; align-items:center; justify-content:center; font-weight:800; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(16,185,129,0.4);">
+                                T</div>
+                            <div>
+                                <div style="font-size: 1.1rem;">Teachers & System</div>
+                                <div style="font-size:0.85rem; color:var(--success); font-weight: 600;">● Online Chat
+                                </div>
+                            </div>
+                            <button class="btn-outline" style="margin-left:auto; padding: 6px 12px; font-size: 0.85rem"
+                                onclick="loadInbox()">Refresh Inbox</button>
+                        </div>
+                        <div class="chat-messages" id="inboxList">
+                            <!-- JS populated -->
+                        </div>
+                        <form id="sendMessageForm" class="chat-input-area d-flex gap-2">
+                            <input type="text" id="msgTeacherId" class="input-glass" placeholder="Teacher User ID"
+                                style="width: 150px; padding: 12px;" required>
+                            <input type="text" id="msgContent" class="input-glass" placeholder="Type your message..."
+                                style="flex: 1; padding: 12px;" required>
+                            <button type="submit" class="btn-primary"
+                                style="width: 50px; padding: 12px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--secondary), var(--primary));">
+                                <svg style="width:24px;height:24px;transform:translateX(-2px)" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tab: Profile -->
+                <div id="profile-tab" class="tab-pane">
+                    <div class="card text-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; max-width: 600px; margin: 0 auto; padding: 40px; min-height: 400px;">
+                        <div
+                            style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary), var(--primary)); margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 800; color: white; box-shadow: 0 10px 25px rgba(236,72,153,0.4);">
+                            S
+                        </div>
+                        <h2 id="profileName" class="mb-2" style="font-size: 2rem;">Name</h2>
+                        <p class="text-slate mb-4" id="profileEmail" style="font-size: 1.1rem;">email@example.com</p>
+                        <div class="d-flex justify-center align-center gap-3 mb-4 flex-wrap">
+                            <span class="badge badge-success" style="font-size: 0.9rem; padding: 8px 16px;">Role:
+                                STUDENT</span>
+                            <span class="badge badge-warning" id="profileId"
+                                style="font-size: 0.9rem; padding: 8px 16px;">ID: </span>
+                        </div>
+                        <div class="glass-panel text-left mt-4 mx-auto" style="background: rgba(255,255,255,0.02); width: 100%;">
+                            <h4 class="mb-2 text-center" style="color: var(--secondary)">Account Status</h4>
+                            <p class="text-slate text-center" style="font-size:1rem; line-height: 1.6; margin: 0 auto;">Your account is
+                                fully active and enrolled in the smart class system. You can browse available classes,
+                                take exams, and communicate directly with your teachers.</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-
-            <!-- Tab: Communication -->
-            <div id="communication-tab" class="tab-pane">
-                <div class="glass-panel mb-4">
-                    <h4 class="mb-4">Message A Teacher</h4>
-                    <form id="sendMessageForm">
-                        <input type="number" id="msgTeacherId" class="input-glass mb-4" placeholder="Teacher User ID" required>
-                        <textarea id="msgContent" class="input-glass mb-4" rows="3" placeholder="Type your message..." required></textarea>
-                        <button type="submit" class="btn-primary">Send Message</button>
-                    </form>
-                </div>
-
-                <div class="glass-panel">
-                    <h4 class="mb-4">My Inbox</h4>
-                    <button class="btn-outline mb-4" onclick="loadInbox()">Refresh Inbox</button>
-                    <div id="inboxList" style="display:flex; flex-direction:column; gap:10px;">
-                        <!-- JS populated -->
-                    </div>
-                </div>
-            </div>
-
-        </main>
+        </div>
     </div>
 
-    <!-- Crisis Widget Top Banner -->
+    <!-- Crisis Widget Top Banner Redesign -->
     <div id="crisis-widget">
-        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+            style="width: 28px; height: 28px;">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <span id="crisis-message">Crisis Alert System Active</span>
     </div>
@@ -167,6 +338,14 @@
             }
             document.getElementById('userName').textContent = user.name;
             document.getElementById('sidebarName').textContent = user.name;
+
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').textContent = user.email;
+            document.getElementById('profileId').textContent = "ID: " + user.id;
+
+            if (window.innerWidth > 768) {
+                document.getElementById('desktopBrand').style.display = 'flex';
+            }
         };
 
         const logout = () => {
@@ -174,11 +353,31 @@
             window.location.href = '/';
         };
 
+        const toggleDrawer = () => {
+            document.getElementById('mobileDrawer').classList.toggle('active');
+            document.getElementById('drawerOverlay').classList.toggle('active');
+        };
+
         const switchTab = (tabId) => {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+
+            // Find corresponding desktop tab btn
+            const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+
+            // Sync drawer
+            document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active'));
+            const drawerBtn = Array.from(document.querySelectorAll('.drawer-item')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (drawerBtn) drawerBtn.classList.add('active');
+        };
+
+        const switchDrawerTab = (tabId, element) => {
+            switchTab(tabId);
+            if (window.innerWidth <= 768) {
+                toggleDrawer();
+            }
         };
 
         let myEnrolledClassIds = [];
@@ -189,71 +388,71 @@
                     method: 'POST',
                     body: JSON.stringify({ class_id })
                 });
-                showToast('Enrolled successfully!');
+                showToast('Enrolled successfully!', 'success');
                 await loadClasses();
                 await loadAllClasses();
-            } catch(e) {
+            } catch (e) {
                 showToast(e.message, 'error');
             }
         };
 
         const loadClasses = async () => {
             const tbody = document.getElementById('classesList');
-            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>';
             try {
                 const classes = await apiFetch('/classes');
                 tbody.innerHTML = '';
-                
+
                 myEnrolledClassIds = classes.map(c => c.id);
                 document.getElementById('totalEnrolledStat').textContent = classes.length;
 
                 if (classes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4">Not enrolled in any classes</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Not enrolled in any classes</td></tr>';
                 }
-                
-                for(let c of classes) {
+
+                for (let c of classes) {
                     const time = new Date(c.schedule_time).toLocaleString();
                     const tr = document.createElement('tr');
-                    
+
                     let attStatus = 'Pending';
                     try {
                         const attData = await apiFetch(`/attendance/${c.id}`);
-                        if(attData.length > 0) {
+                        if (attData.length > 0) {
                             attStatus = `<span class="badge ${attData[0].status === 'PRESENT' ? 'badge-success' : 'badge-danger'}">${attData[0].status}</span>`;
                         } else {
                             attStatus = `<span class="badge" style="background: rgba(255,255,255,0.1); color: var(--warning)">Awaiting Teacher</span>`;
                         }
-                    } catch(e) {}
-                    
+                    } catch (e) { }
+
                     tr.innerHTML = `
                         <td>
-                            <b>${c.name}</b><br>
-                            <span class="text-slate" style="font-size:0.8rem">Teacher: ${c.teacher_name}</span>
+                            <b style="color:white; font-size:1.1rem">${c.name}</b><br>
+                            <span class="text-slate" style="font-size:0.85rem">Teacher: ${c.teacher_name}</span>
                         </td>
-                        <td>${time}</td>
-                        <td><a href="${c.meeting_link}" target="_blank" style="color: var(--secondary)">Join Meet</a></td>
+                        <td style="color:#e2e8f0">${time}</td>
+                        <td><a href="${c.meeting_link}" target="_blank" style="color: var(--secondary); font-weight:600; text-decoration:none;">Join Meet</a></td>
                         <td>${attStatus}</td>
                     `;
                     tbody.appendChild(tr);
                 }
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="4" style="color:red">Failed to load schedule</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="color:red" class="text-center py-4">Failed to load schedule</td></tr>';
                 showToast('Failed to load classes', 'error');
             }
         };
 
         const loadAllClasses = async () => {
             const tbody = document.getElementById('allClassesList');
-            tbody.innerHTML = '<tr><td colspan="4">Loading available classes...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Loading available classes...</td></tr>';
             try {
                 const classes = await apiFetch('/classes/all');
                 tbody.innerHTML = '';
-                
+
                 if (classes.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4">No classes exist yet!</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No classes exist yet!</td></tr>';
                 }
-                
-                for(let c of classes) {
+
+                for (let c of classes) {
                     // Skip if already enrolled
                     if (myEnrolledClassIds.includes(c.id)) {
                         continue;
@@ -261,126 +460,264 @@
 
                     const time = new Date(c.schedule_time).toLocaleString();
                     const tr = document.createElement('tr');
-                    
+
                     tr.innerHTML = `
                         <td>
-                            <b>${c.name}</b>
-                            <span class="badge badge-warning" style="font-size:0.7rem; margin-left: 8px;">ID: ${c.id}</span>
+                            <b style="color:white; font-size:1.1rem">${c.name}</b>
+                            <span class="badge badge-warning" style="font-size:0.75rem; margin-left: 8px;">ID: ${c.id}</span>
                         </td>
-                        <td>${c.teacher_name} (User ID: ${c.teacher_id})</td>
-                        <td>${time}</td>
+                        <td style="color:#e2e8f0">${c.teacher_name} <br><span class="text-slate" style="font-size:0.8rem">(User ID: ${c.teacher_id})</span></td>
+                        <td style="color:#e2e8f0">${time}</td>
                         <td>
-                            <button onclick="enroll('${c.id}')" class="btn-primary" style="padding: 6px 12px; font-size: 0.9rem;">Quick Enroll</button>
+                            <button onclick="enroll('${c.id}')" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem; background: linear-gradient(135deg, var(--secondary), var(--primary));">Quick Enroll</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 }
-                
-                if(tbody.innerHTML === '') {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">You have enrolled in all available classes! 🎉</td></tr>';
+
+                if (tbody.innerHTML === '') {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-slate">You have enrolled in all available classes! 🎉</td></tr>';
                 }
 
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="4" style="color:red">Failed to load classes list</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="color:red" class="text-center py-4">Failed to load classes list</td></tr>';
             }
         };
 
         const loadPerformance = async () => {
             const tbody = document.getElementById('performanceList');
-            tbody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>';
             try {
                 const data = await apiFetch('/academic/performance');
                 tbody.innerHTML = '';
-                
-                if(data.exams.length === 0 && data.attendance.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5">No academic records found.</td></tr>';
+
+                if (data.exams.length === 0 && data.attendance.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate">No academic records found.</td></tr>';
                     return;
                 }
-                
+
+                let chartLabels = [];
+                let chartScores = [];
+
                 // Render Exams
                 data.exams.forEach(p => {
                     const tr = document.createElement('tr');
-                    
+
                     let statusHtml = '';
                     let actionHtml = '';
-                    
+
                     if (p.score !== null && p.score !== undefined) {
-                        let badge = p.score > 50 ? 'badge-success' : 'badge-danger';
-                        statusHtml = `<span class="badge ${badge}">${p.score}%</span>`;
-                        actionHtml = `<span class="text-slate">Graded</span>`;
+                        if (parseFloat(p.score) === 0) {
+                            statusHtml = `<span class="badge badge-warning">Awaiting Grading</span>`;
+                            actionHtml = `<span class="text-slate" style="font-weight:600">Completed Exam</span>`;
+                            // Exclude from chart as 0 is just a dummy placement score
+                        } else {
+                            let badge = p.score > 50 ? 'badge-success' : 'badge-danger';
+                            statusHtml = `<span class="badge ${badge}">${p.score}%</span>`;
+                            actionHtml = `<span class="text-slate" style="font-weight:600">Completed Exam</span>`;
+                            chartLabels.push(p.exam_title);
+                            chartScores.push(p.score);
+                        }
                     } else {
-                        statusHtml = `<span class="badge badge-warning">Pending Grade</span>`;
+                        statusHtml = `<span class="badge badge-warning">Available</span>`;
                         const safeTitle = (p.exam_title || '').replace(/'/g, "\\'");
-                        const safeContent = (p.exam_content || '').replace(/'/g, "\\'");
-                        actionHtml = `<button onclick="startExam('${safeTitle}', ${p.duration_minutes || 60}, '${safeContent}')" class="btn-outline" style="color:var(--warning); border-color:var(--warning)">Take Exam</button>`;
+                        // Need to encode content securely since it might contain html or line breaks
+                        const safeContent = encodeURIComponent(p.exam_content || '');
+                        actionHtml = `<button onclick="startExam('${p.exam_id}', '${safeTitle}', ${p.duration_minutes || 60}, '${safeContent}')" class="btn-outline" style="color:var(--warning); border-color:var(--warning); padding: 6px 12px; font-size: 0.85rem;">Take Exam</button>`;
                     }
 
                     // Look up attendance for this class
                     let attPct = 'N/A';
                     const attObj = data.attendance.find(a => a.class_name === p.class_name);
-                    if(attObj) {
+                    if (attObj) {
                         let attBadge = attObj.percentage >= 75 ? 'badge-primary' : 'badge-danger';
-                        attPct = `<span class="badge ${attBadge}">${attObj.percentage}% Attendance</span>`;
+                        // We don't have badge-primary, fallback to success/warning based on attendance logic. >= 75 success.
+                        attBadge = attObj.percentage >= 75 ? 'badge-success' : 'badge-danger';
+                        attPct = `<span class="badge ${attBadge}" style="font-size:0.75rem; margin-top:4px;">${attObj.percentage}% Attendance</span>`;
                     }
 
                     tr.innerHTML = `
-                        <td><b>${p.class_name}</b><br>${attPct}</td>
-                        <td>${p.exam_title}</td>
-                        <td><span class="badge badge-warning">ID: ${p.exam_id}</span></td>
+                        <td><b style="color:white; font-size: 1.05rem">${p.class_name}</b><br>${attPct}</td>
+                        <td style="color:#e2e8f0">${p.exam_title}</td>
+                        <td><span class="badge badge-warning" style="font-size:0.8rem">ID: ${p.exam_id}</span></td>
                         <td>${statusHtml}</td>
                         <td>${actionHtml}</td>
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="5" style="color:red">Failed to load performance</td></tr>';
+
+                // Render Chart
+                renderChart(chartLabels, chartScores);
+
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red" class="text-center py-4">Failed to load performance</td></tr>';
                 showToast(e.message, 'error');
             }
         };
 
+        let performanceChartInstance = null;
+        const renderChart = (labels, data) => {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (performanceChartInstance) performanceChartInstance.destroy();
+
+            if (labels.length === 0) return; // No graded exams
+
+            // Theme colors matching index.css
+            const primaryColor = '#ec4899'; // secondary color in css (pink)
+            const primaryBg = 'rgba(236, 72, 153, 0.2)';
+
+            performanceChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Exam Scores (%)',
+                        data: data,
+                        borderColor: primaryColor,
+                        backgroundColor: primaryBg,
+                        borderWidth: 2,
+                        pointBackgroundColor: primaryColor,
+                        pointBorderColor: '#ffffff',
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: primaryColor,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94A3B8' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94A3B8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#ffffff' } },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1
+                        }
+                    }
+                }
+            });
+        };
+
         let examInterval;
-        const startExam = (title, durationMinutes, contentLink) => {
+        let activeExamId = null;
+
+        const startExam = (examId, title, durationMinutes, contentLinkEncoded) => {
             clearInterval(examInterval);
+            activeExamId = examId;
+            const contentLink = decodeURIComponent(contentLinkEncoded);
+
             document.getElementById('examModal').style.display = 'block';
             document.getElementById('liveExamTitle').textContent = `Live: ${title}`;
-            document.getElementById('liveExamLink').href = contentLink;
-            if (!contentLink) document.getElementById('liveExamLink').style.display = 'none';
-            else document.getElementById('liveExamLink').style.display = 'inline-block';
-            
+
+            const contentContainer = document.getElementById('liveExamContentContainer');
+            contentContainer.innerHTML = '';
+
+            if (contentLink) {
+                const lowerLink = contentLink.toLowerCase();
+                if (lowerLink.startsWith('/uploads/') && (lowerLink.endsWith('.png') || lowerLink.endsWith('.jpg') || lowerLink.endsWith('.jpeg'))) {
+                    contentContainer.innerHTML = `<img src="${contentLink}" style="max-width:100%; border-radius:8px;">`;
+                } else if (lowerLink.startsWith('/uploads/') && lowerLink.endsWith('.pdf')) {
+                    contentContainer.innerHTML = `<a href="${contentLink}" target="_blank" class="btn-primary" style="background:var(--warning); display:inline-block; padding: 10px 20px;">Open PDF Exam Material</a>`;
+                } else {
+                    contentContainer.innerHTML = `<div style="padding:20px; background:rgba(255,255,255,0.05); border-radius:12px; white-space:pre-wrap; border: 1px solid rgba(255,255,255,0.1); color:#e2e8f0; font-size: 1.05rem; line-height: 1.6;">${contentLink}</div>`;
+                }
+            }
+
             let timeRemaining = durationMinutes * 60;
             const timerEl = document.getElementById('examTimer');
-            
+
             const updateTimer = () => {
                 const mins = Math.floor(timeRemaining / 60);
                 const secs = timeRemaining % 60;
                 timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                
+
+                if (timeRemaining < 300) {
+                    timerEl.style.color = '#fecaca'; // Light red for warning
+                }
+
                 if (timeRemaining <= 0) {
-                    clearInterval(examInterval);
-                    timerEl.textContent = "00:00";
-                    alert("⚠️ TIME IS UP! EXAM HAS CONCLUDED!");
-                    document.getElementById('examModal').style.display = 'none';
+                    submitExamAttempt(true);
                 }
                 timeRemaining--;
             };
-            
+
             updateTimer();
             examInterval = setInterval(updateTimer, 1000);
-            
+
             // Scroll to top to see exam
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        const cancelExam = () => {
+            clearInterval(examInterval);
+            activeExamId = null;
+            document.getElementById('examModal').style.display = 'none';
+        };
+
+        const submitExamAttempt = async (auto = false) => {
+            if (!activeExamId) return;
+            if (!auto && !confirm("Are you sure you want to end your attempt? This cannot be undone.")) return;
+
+            clearInterval(examInterval);
+            document.getElementById('examModal').style.display = 'none';
+
+            const fileInput = document.getElementById('examScriptInput');
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+
+            formData.append('exam_id', activeExamId);
+            if (fileInput.files[0]) {
+                formData.append('exam_script', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/api/academic/results/submit', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.message || 'Error submitting attempt');
+                }
+
+                if (auto) {
+                    Swal.fire('Time Up!', 'Your exam was automatically submitted.', 'warning');
+                } else {
+                    showToast('Exam attempt submitted successfully!', 'success');
+                }
+                loadPerformance();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        };
+
         document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const payload = { 
+            const payload = {
                 receiver_id: document.getElementById('msgTeacherId').value,
-                message: document.getElementById('msgContent').value 
+                message: document.getElementById('msgContent').value
             };
             try {
                 await apiFetch('/communication/message', { method: 'POST', body: JSON.stringify(payload) });
-                showToast('Message Sent successfully!');
-                e.target.reset();
+                document.getElementById('msgContent').value = '';
+                loadInbox(); // Reload the chat
             } catch (err) {
                 showToast(err.message, 'error');
             }
@@ -388,36 +725,40 @@
 
         const loadInbox = async () => {
             const list = document.getElementById('inboxList');
-            list.innerHTML = 'Loading messages...';
+            list.innerHTML = '<span class="text-slate text-center" style="margin-top:20px">Loading messages...</span>';
             try {
                 const msgs = await apiFetch('/communication/inbox');
                 list.innerHTML = '';
-                if(msgs.length === 0) list.innerHTML = '<span class="text-slate">No messages found.</span>';
-                
-                msgs.forEach(m => {
+                if (msgs.length === 0) list.innerHTML = '<span class="text-slate text-center" style="margin-top:20px">No messages found. Start chatting!</span>';
+
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+                msgs.reverse().forEach(m => {
+                    const isMine = m.sender_id === user.id;
                     const el = document.createElement('div');
-                    el.style.borderLeft = m.receiver_id === null ? "4px solid var(--warning)" : "4px solid var(--primary)";
-                    el.style.padding = "10px";
-                    el.style.background = "rgba(255,255,255,0.05)";
-                    
-                    const time = new Date(m.timestamp).toLocaleString();
+                    el.className = `chat-message ${isMine ? 'sent' : 'received'}`;
+
+                    const time = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
                     el.innerHTML = `
-                        <div class="d-flex justify-between mb-2">
-                            <b>${m.sender_name} <span class="badge ${m.receiver_id === null ? 'badge-warning' : 'badge-success'}">${m.receiver_id === null ? 'Global' : 'Direct'}</span></b>
-                            <span class="text-slate" style="font-size:0.8rem">${time}</span>
-                        </div>
-                        <p style="margin:0">${m.message}</p>
+                        ${!isMine ? `<b style="font-size:0.85rem; display:block; margin-bottom:6px; color: var(--secondary)">${m.sender_name}</b>` : ''}
+                        ${m.message}
+                        <span class="chat-meta">${time}</span>
                     `;
                     list.appendChild(el);
                 });
+
+                // Scroll to bottom
+                list.scrollTop = list.scrollHeight;
+
             } catch (e) {
-                list.innerHTML = '<span style="color:red">Error loading inbox</span>';
+                list.innerHTML = '<span style="color:red; text-align:center">Error loading inbox</span>';
             }
         }
 
         const initLoad = async () => {
             checkAuth();
-            await loadClasses(); 
+            await loadClasses();
             await loadAllClasses();
             await loadPerformance();
             await loadInbox();
@@ -426,4 +767,5 @@
         initLoad();
     </script>
 </body>
+
 </html>

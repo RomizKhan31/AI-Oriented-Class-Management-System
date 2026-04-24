@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS results (
     exam_id VARCHAR(50) NOT NULL,
     student_id VARCHAR(50) NOT NULL,
     score DECIMAL(5,2) NOT NULL,
+    script_path VARCHAR(255) NULL,
     FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );

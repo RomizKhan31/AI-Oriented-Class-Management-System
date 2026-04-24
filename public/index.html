@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Class Management | Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Use Outfit font from index.css instead of Inter -->
+    <link rel="icon" type="image/jpeg" href="/img/favicon.jpg">
     <link rel="stylesheet" href="/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .login-container {
             min-height: 100vh;
@@ -13,46 +15,84 @@
             align-items: center;
             justify-content: center;
             padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(15,23,42,0) 50%);
+            animation: rotateBg 20s linear infinite;
+            z-index: 0;
+        }
+        @keyframes rotateBg {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .login-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            z-index: 1;
+            position: relative;
+        }
+        .app-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+            transform: rotate(-10deg);
+            transition: transform 0.3s ease;
+        }
+        .login-card:hover .app-logo {
+            transform: rotate(0deg) scale(1.05);
+        }
+        .app-logo svg {
+            color: white;
+            width: 32px;
+            height: 32px;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="glass-panel login-card animate-fade-in">
-            <h1 class="nav-brand text-center mb-4">Smart Class</h1>
+            <div class="app-logo">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <h1 class="nav-brand mb-2" style="justify-content: center; font-size: 2rem;">Smart Class</h1>
+            <p class="text-center text-slate mb-4" style="font-size: 0.9rem;">AI-Oriented Academic Management</p>
 
-            <div class="tabs-nav" style="justify-content: center; margin-bottom: 1rem;">
+            <div class="tabs-nav" style="justify-content: center; margin-bottom: 2rem;">
                 <button class="tab-btn active" onclick="switchAuthTab('loginTab')">Sign In</button>
-                <button class="tab-btn" onclick="switchAuthTab('registerTab')">Register Student</button>
+                <button class="tab-btn" onclick="switchAuthTab('registerTab')">Register</button>
             </div>
 
             <div id="loginTab" class="tab-pane active">
-                <p class="text-center text-slate mb-4">Login to access your dashboard</p>
                 <form id="loginForm">
                     <input type="email" id="email" class="input-glass mb-4" placeholder="Email Address" required>
                     <input type="password" id="password" class="input-glass mb-4" placeholder="Password" required>
-                    <button type="submit" class="btn-primary">Sign In</button>
+                    <button type="submit" class="btn-primary mt-2">Sign In to Dashboard</button>
                 </form>
-                <div class="text-center mt-4">
-                    <p class="text-slate">Demo Admin: a@demo.com</p>
-                    <p class="text-slate">Demo Teacher: t@demo.com</p>
-                    <p class="text-slate">Demo Student: s@demo.com</p>
-                    <p class="text-slate" style="font-size: 0.8rem">Password for all: password</p>
-                </div>
             </div>
 
             <div id="registerTab" class="tab-pane">
-                <p class="text-center text-slate mb-4">Create a new Student Account</p>
                 <form id="registerForm">
                     <input type="text" id="regId" class="input-glass mb-4" placeholder="Custom Student ID (Optional)">
                     <input type="text" id="regName" class="input-glass mb-4" placeholder="Full Name" required>
                     <input type="email" id="regEmail" class="input-glass mb-4" placeholder="Email Address" required>
                     <input type="password" id="regPassword" class="input-glass mb-4" placeholder="Password" required>
-                    <button type="submit" class="btn-primary">Sign Up as Student</button>
+                    <button type="submit" class="btn-primary mt-2">Create Account</button>
                 </form>
             </div>
         </div>
@@ -60,7 +100,7 @@
 
     <!-- Crisis Widget -->
     <div id="crisis-widget">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 24px; height: 24px;">
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 24px; height: 24px;">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <span id="crisis-message">Crisis Alert System Active</span>

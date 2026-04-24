@@ -3,7 +3,7 @@ const pool = require('../config/db');
 exports.createExam = async (req, res) => {
     try {
         const { id, class_id, title, details, duration_minutes } = req.body;
-        let exam_content = req.body.exam_content; 
+        let exam_content = req.body.exam_content_text || null; 
         
         // If a physical file was uploaded, use the server path
         if (req.file) {
@@ -37,19 +37,55 @@ exports.getExamsByClass = async (req, res) => {
     }
 };
 
+exports.getTeacherData = async (req, res) => {
+    try {
+        const teacherId = req.user.id;
+        
+        // Get all exams for this teacher's classes
+        const [exams] = await pool.query(`
+            SELECT e.id, e.title, c.name as class_name
+            FROM exams e
+            JOIN classes c ON e.class_id = c.id
+            WHERE c.teacher_id = ?
+        `, [teacherId]);
+
+        // Get all students enrolled in this teacher's classes
+        const [students] = await pool.query(`
+            SELECT DISTINCT u.id, u.name
+            FROM users u
+            JOIN enrollments en ON u.id = en.student_id
+            JOIN classes c ON en.class_id = c.id
+            WHERE c.teacher_id = ?
+        `, [teacherId]);
+
+        res.json({ exams, students });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 exports.assignResult = async (req, res) => {
     try {
         const { exam_id, student_id, score } = req.body;
-        // Upsert logical operation
+        
+        // Strict exam constraint: Check if result already exists
         const [existing] = await pool.query('SELECT id FROM results WHERE exam_id = ? AND student_id = ?', [exam_id, student_id]);
         
         if (existing.length > 0) {
-            await pool.query('UPDATE results SET score = ? WHERE id = ?', [score, existing[0].id]);
+            // Prevent duplicate attempts/overwrites from the student side 
+            // Note: If teacher needs to edit, they would use a separate teacher-only endpoint.
+            // Since this endpoint is used globally right now, we will enforce strictness.
+            if (req.user.role === 'STUDENT') {
+                return res.status(403).json({ message: 'Exam attempt already recorded. Duplicate attempts are strictly prohibited.' });
+            } else {
+                // Let Teachers override
+                await pool.query('UPDATE results SET score = ? WHERE id = ?', [score, existing[0].id]);
+                return res.json({ message: 'Result updated successfully by Teacher' });
+            }
         } else {
             await pool.query('INSERT INTO results (exam_id, student_id, score) VALUES (?, ?, ?)', [exam_id, student_id, score]);
+            return res.json({ message: 'Result recorded successfully' });
         }
-
-        res.json({ message: 'Result recorded successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -99,6 +135,61 @@ exports.getStudentPerformance = async (req, res) => {
         }
 
         res.json({ exams, attendance });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.submitExamScript = async (req, res) => {
+    try {
+        const { exam_id } = req.body;
+        const student_id = req.user.id;
+        
+        let script_path = null;
+        if (req.file) {
+            script_path = '/uploads/' + req.file.filename;
+        }
+
+        const [existing] = await pool.query('SELECT id FROM results WHERE exam_id = ? AND student_id = ?', [exam_id, student_id]);
+        
+        if (existing.length > 0) {
+            return res.status(403).json({ message: 'Exam attempt already recorded. Duplicate attempts are strictly prohibited.' });
+        }
+        
+        await pool.query(
+            'INSERT INTO results (exam_id, student_id, score, script_path) VALUES (?, ?, ?, ?)',
+            [exam_id, student_id, 0, script_path]
+        );
+        
+        res.json({ message: 'Exam script submitted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+exports.getSubmissions = async (req, res) => {
+    try {
+        const teacherId = req.user.id;
+        
+        const [submissions] = await pool.query(`
+            SELECT 
+                r.id as result_id,
+                r.exam_id,
+                e.title as exam_title,
+                c.name as class_name,
+                r.student_id,
+                u.name as student_name,
+                r.score,
+                r.script_path
+            FROM results r
+            JOIN exams e ON r.exam_id = e.id
+            JOIN classes c ON e.class_id = c.id
+            JOIN users u ON r.student_id = u.id
+            WHERE c.teacher_id = ?
+            ORDER BY r.id DESC
+        `, [teacherId]);
+
+        res.json(submissions);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

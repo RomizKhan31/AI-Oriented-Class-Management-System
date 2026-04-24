@@ -1,86 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Class Management | Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/jpeg" href="/img/favicon.jpg">
     <link rel="stylesheet" href="/css/index.css">
-    <style>
-        .admin-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 2rem;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
-    <nav class="glass-nav">
-        <div class="nav-brand">Smart Class Admin</div>
-        <div class="d-flex align-center gap-2">
-            <span id="userName" class="text-slate"></span>
-            <button onclick="logout()" class="btn-outline">Logout</button>
-        </div>
-    </nav>
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 
-    <div class="admin-container">
-        <div class="glass-panel text-center mb-4">
-            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--danger); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold;">A</div>
-            <h3 id="sidebarName">System Administrator</h3>
-            <span class="badge badge-danger">High Privilege</span>
-        </div>
-
-        <!-- Tabs Navigation -->
-        <div class="tabs-nav" style="justify-content: center">
-            <button class="tab-btn active" onclick="switchTab('provision-tab')">Provision Teacher</button>
-            <button class="tab-btn" onclick="switchTab('oversight-tab')">System Oversight</button>
-        </div>
-
-        <!-- Tab: Add Teacher -->
-        <div id="provision-tab" class="tab-pane active glass-panel text-center mb-4">
-            <h4 class="mb-4">Provision New Teacher</h4>
-            <p class="text-slate mb-4">As an Administrator, you uniquely have the authority to provision strict Teacher accounts with hardcoded Employee/Teacher IDs.</p>
-            
-            <form id="createTeacherForm">
-                <input type="text" id="teachId" class="input-glass mb-4" placeholder="Custom Teacher ID (e.g. INS-482)" required>
-                <input type="text" id="teachName" class="input-glass mb-4" placeholder="Full Name" required>
-                <input type="email" id="teachEmail" class="input-glass mb-4" placeholder="Email Address" required>
-                <input type="password" id="teachPassword" class="input-glass mb-4" placeholder="Secure Password" required>
-                <button type="submit" class="btn-primary" style="background:var(--danger)">Provision Teacher Account</button>
-            </form>
-        </div>
-
-        <!-- Tab: System Oversight -->
-        <div id="oversight-tab" class="tab-pane glass-panel">
-            <div class="d-flex justify-between align-center mb-4 border-bottom pb-2">
-                <h4>Platform Surveillance</h4>
-                <div class="d-flex gap-2">
-                    <button onclick="downloadGlobalCSV()" class="btn-primary" style="background:var(--success)">Export CSV</button>
-                    <button onclick="printToPDF()" class="btn-outline">Print Table to PDF</button>
-                    <button onclick="loadUsers()" class="btn-outline">Refresh Data</button>
+    <div class="app-layout">
+        <!-- Mobile Drawer -->
+        <nav class="mobile-drawer" id="mobileDrawer">
+            <div class="drawer-header">
+                <div class="nav-brand" style="font-size: 1.2rem;">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:24px; height:24px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Smart Class
                 </div>
+                <button class="drawer-close" onclick="toggleDrawer()">×</button>
             </div>
-            <div style="overflow-x: auto;">
-                <table class="glass-table" id="adminDataTable">
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Name & Email</th>
-                            <th>Role</th>
-                            <th>Platform Activity</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="oversightList"></tbody>
-                </table>
+
+            <div class="text-center mb-4">
+                <div
+                    style="width: 60px; height: 60px; border-radius: 50%; background: var(--danger); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white;">
+                    A
+                </div>
+                <h4 id="sidebarName">Admin</h4>
+                <span class="badge badge-danger" style="font-size: 0.7rem;">High Privilege</span>
+            </div>
+
+            <div class="drawer-nav">
+                <button class="drawer-item active" onclick="switchDrawerTab('provision-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    Provision Teacher
+                </button>
+                <button class="drawer-item" onclick="switchDrawerTab('oversight-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    System Oversight
+                </button>
+                <button class="drawer-item" onclick="switchDrawerTab('profile-tab', this)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Profile
+                </button>
+                <div style="flex-grow: 1;"></div>
+                <button class="drawer-item" onclick="logout()" style="color: var(--danger); margin-top: auto;">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:20px;height:20px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <nav class="glass-nav" style="justify-content: space-between;">
+                <div class="nav-brand" style="display:flex; margin-left:0;" id="desktopBrand">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                        style="width:24px; height:24px;">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    Admin Portal
+                </div>
+
+                <div class="d-flex align-center gap-3" style="margin-left:auto;">
+                    <!-- Desktop Actions -->
+                    <div class="d-none d-md-flex align-center gap-3">
+                        <span id="userName" class="text-slate" style="font-weight: 600;"></span>
+                        <button onclick="logout()" class="btn-outline" style="padding: 8px 16px;">Logout</button>
+                    </div>
+                    <!-- Mobile Toggle -->
+                    <button class="menu-toggle" onclick="toggleDrawer()">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                            style="width: 28px; height: 28px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="dashboard-container" style="max-width: 900px;">
+                <!-- Desktop Tabs (Visible only on larger screens) -->
+
+                <div class="tabs-nav" style="justify-content: center; justify-self: center;">
+                    <button class="tab-btn active" onclick="switchTab('provision-tab')">Provision Teacher</button>
+                    <button class="tab-btn" onclick="switchTab('oversight-tab')">System Oversight</button>
+                    <button class="tab-btn" onclick="switchTab('profile-tab')">Profile</button>
+                </div>
+
+                <!-- Tab: Add Teacher -->
+                <div id="provision-tab" class="tab-pane active card text-center mb-4">
+                    <h4 class="mb-4">Provision New Teacher</h4>
+                    <p class="text-slate mb-4">As an Administrator, you uniquely have the authority to provision strict
+                        Teacher
+                        accounts with hardcoded Employee/Teacher IDs.</p>
+
+                    <form id="createTeacherForm" style="max-width: 500px; margin: 0 auto;">
+                        <input type="text" id="teachId" class="input-glass mb-4"
+                            placeholder="Custom Teacher ID (e.g. INS-482)" required>
+                        <input type="text" id="teachName" class="input-glass mb-4" placeholder="Full Name" required>
+                        <input type="email" id="teachEmail" class="input-glass mb-4" placeholder="Email Address"
+                            required>
+                        <input type="password" id="teachPassword" class="input-glass mb-4" placeholder="Secure Password"
+                            required>
+                        <button type="submit" class="btn-primary mt-2"
+                            style="background: linear-gradient(135deg, var(--danger), #991b1b);">Provision Teacher
+                            Account</button>
+                    </form>
+                </div>
+
+                <!-- Tab: System Oversight -->
+                <div id="oversight-tab" class="tab-pane card">
+                    <div class="d-flex align-center mb-4 pb-2"
+                        style="border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 1rem; justify-content: center; text-align: center;">
+                        <h4 style="margin: 0; font-size: 1.3rem;">Platform Surveillance</h4>
+                        <div class="d-flex gap-2" style="justify-content: center;">
+                            <button onclick="downloadGlobalReport('excel')" class="btn-primary"
+                                style="background: linear-gradient(135deg, var(--success), #047857); padding: 8px 16px; font-size: 0.9rem;">Export
+                                Excel</button>
+                            <button onclick="downloadGlobalReport('pdf')" class="btn-outline"
+                                style="padding: 8px 16px; font-size: 0.9rem;">Export PDF</button>
+                            <button onclick="loadUsers()" class="btn-outline"
+                                style="padding: 8px 16px; font-size: 0.9rem;">Refresh</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="glass-table" id="adminDataTable">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name & Email</th>
+                                    <th>Role</th>
+                                    <th>Activity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="oversightList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab: Profile -->
+                <div id="profile-tab" class="tab-pane card text-center">
+                    <div
+                        style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--danger), #f43f5e); margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 800; color: white; box-shadow: 0 10px 25px rgba(225,29,72,0.4);">
+                        A
+                    </div>
+                    <h2 id="profileName" class="mb-2" style="font-size: 2rem;">Admin Name</h2>
+                    <p class="text-slate mb-4" id="profileEmail" style="font-size: 1.1rem;">admin@example.com</p>
+                    <div class="d-flex justify-center align-center gap-3 mb-4 flex-wrap">
+                        <span class="badge badge-danger" style="font-size: 0.9rem; padding: 8px 16px;">Role:
+                            ADMINISTRATOR</span>
+                        <span class="badge badge-warning" id="profileId"
+                            style="font-size: 0.9rem; padding: 8px 16px;">ID: </span>
+                    </div>
+                    <div class="glass-panel text-left mt-4 mx-auto"
+                        style="background: rgba(255,255,255,0.02); max-width: 600px;">
+                        <h4 class="mb-2 text-center" style="color: var(--danger)">System Authority</h4>
+                        <p class="text-slate text-center" style="font-size:1rem; line-height: 1.6;">You have root access
+                            to the platform. You can provision faculty accounts, monitor global activity, and generate
+                            platform-wide surveillance reports.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Crisis Widget Top Banner -->
     <div id="crisis-widget">
-        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 28px; height: 28px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg class="pulsing-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+            style="width: 28px; height: 28px;">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <span id="crisis-message">Crisis Alert System Active</span>
     </div>
@@ -95,6 +209,14 @@
             }
             document.getElementById('userName').textContent = user.name;
             document.getElementById('sidebarName').textContent = user.name;
+
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').textContent = user.email;
+            document.getElementById('profileId').textContent = "ID: " + user.id;
+
+            if (window.innerWidth > 768) {
+                document.getElementById('desktopBrand').style.display = 'flex';
+            }
         };
 
         const logout = () => {
@@ -102,43 +224,68 @@
             window.location.href = '/';
         };
 
+        const toggleDrawer = () => {
+            document.getElementById('mobileDrawer').classList.toggle('active');
+            document.getElementById('drawerOverlay').classList.toggle('active');
+        };
+
         const switchTab = (tabId) => {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+
+            // Find corresponding desktop tab btn
+            const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+
+            // Sync drawer
+            document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active'));
+            const drawerBtn = Array.from(document.querySelectorAll('.drawer-item')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (drawerBtn) drawerBtn.classList.add('active');
+        };
+
+        const switchDrawerTab = (tabId, element) => {
+            switchTab(tabId);
+            if (window.innerWidth <= 768) {
+                toggleDrawer();
+            }
         };
 
         const loadUsers = async () => {
             const tbody = document.getElementById('oversightList');
-            tbody.innerHTML = '<tr><td colspan="5">Loading surveillance data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Loading surveillance data...</td></tr>';
             try {
                 const users = await apiFetch('/admin/users');
                 tbody.innerHTML = '';
-                if(users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5">No users found on platform.</td></tr>';
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No users found on platform.</td></tr>';
                 }
                 users.forEach(u => {
                     const tr = document.createElement('tr');
+                    let roleColor = u.role === 'TEACHER' ? 'var(--primary)' : 'var(--warning)';
+                    let badgeClass = u.role === 'TEACHER' ? 'badge-primary' : 'badge-warning';
+                    // We don't have badge-primary in CSS, let's use success for teacher and warning for student
+                    badgeClass = u.role === 'TEACHER' ? 'badge-success' : 'badge-warning';
+
                     tr.innerHTML = `
-                        <td><span class="badge ${u.role === 'TEACHER' ? 'badge-primary' : 'badge-warning'}">${u.id}</span></td>
-                        <td><b>${u.name}</b><br><span style="font-size:0.8rem" class="text-slate">${u.email}</span></td>
-                        <td>${u.role}</td>
-                        <td>${u.activity_metric || 'No Data'}</td>
+                        <td><span style="font-weight:600; color:white;">${u.id}</span></td>
+                        <td><b style="color:white">${u.name}</b><br><span style="font-size:0.85rem" class="text-slate">${u.email}</span></td>
+                        <td><span class="badge ${badgeClass}">${u.role}</span></td>
+                        <td style="color:#e2e8f0">${u.activity_metric || 'No Data'}</td>
                         <td>
-                            <button onclick="deleteUser('${u.id}')" class="btn-primary" style="background:var(--danger); padding:6px 12px; font-size:0.85rem">Ban / Delete</button>
+                            <button onclick="deleteUser('${u.id}')" class="btn-primary" style="background: linear-gradient(135deg, var(--danger), #991b1b); padding:8px 16px; font-size:0.85rem">Ban / Delete</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="5" style="color:red">Failed to load platform data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red" class="text-center py-4">Failed to load platform data</td></tr>';
                 showToast(err.message, 'error');
             }
         };
 
         const deleteUser = async (id) => {
-            if(!confirm(`WARNING: Are you sure you wish to ban user [${id}]? This will completely wipe all associated enrollments, grades, attendance, and data cascade.`)) return;
+            if (!confirm(`WARNING: Are you sure you wish to ban user [${id}]? This will completely wipe all associated enrollments, grades, attendance, and data cascade.`)) return;
             try {
                 await apiFetch(`/admin/users/${id}`, { method: 'DELETE' });
                 showToast(`User ${id} terminated successfully.`, 'success');
@@ -148,34 +295,25 @@
             }
         };
 
-        const downloadGlobalCSV = () => {
+        const downloadGlobalReport = (format = 'excel') => {
             const token = localStorage.getItem('token');
-            fetch('/api/export/global', { headers: {'Authorization': `Bearer ${token}`} })
-            .then(res => {
-                if(!res.ok) throw new Error('Export failed');
-                return res.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Platform_Global_Report.csv`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-            .catch(e => showToast(e.message, 'error'));
-        };
-
-        const printToPDF = () => {
-            // Natively utilizes the browser's PDF Print dialogue scoped to the Table
-            const printContent = document.getElementById('adminDataTable').outerHTML;
-            const originalBody = document.body.innerHTML;
-            document.body.innerHTML = '<h2>Smart Class Admin Oversight Report</h2><br>' + printContent;
-            window.print();
-            // Restore actual app logic bypassing reload
-            document.body.innerHTML = originalBody;
-            window.location.reload(); // Hard reload to quickly snap listeners back safely into place post-print
+            // The endpoints in routes/admin.js are /export/pdf and /export/excel
+            fetch(`/api/admin/export/${format}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                .then(res => {
+                    if (!res.ok) throw new Error('Export failed');
+                    return res.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Platform_Global_Report.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    showToast(`Exported ${format.toUpperCase()} successfully`, 'success');
+                })
+                .catch(e => showToast(e.message, 'error'));
         };
 
         document.getElementById('createTeacherForm').addEventListener('submit', async (e) => {
@@ -202,4 +340,5 @@
         loadUsers();
     </script>
 </body>
+
 </html>
