@@ -3,6 +3,17 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const pool = require('./db');
 
+const getCallbackUrl = (provider) => {
+    // Use BASE_URL if set, or Render's default URL, otherwise fallback to relative URL
+    const baseUrl = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL;
+    if (baseUrl) {
+        // Ensure no trailing slash on baseUrl
+        const cleanBaseUrl = baseUrl.replace(/\/$/, '');
+        return `${cleanBaseUrl}/api/auth/${provider}/callback`;
+    }
+    return `/api/auth/${provider}/callback`;
+};
+
 // Helper to process OAuth profiles
 const processOAuthProfile = async (provider, profile, done) => {
     try {
@@ -50,7 +61,8 @@ const processOAuthProfile = async (provider, profile, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'dummy_client_id',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy_client_secret',
-    callbackURL: "/api/auth/google/callback"
+    callbackURL: getCallbackUrl('google'),
+    proxy: true
   },
   (accessToken, refreshToken, profile, done) => {
       processOAuthProfile('GOOGLE', profile, done);
@@ -60,7 +72,8 @@ passport.use(new GoogleStrategy({
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID || 'dummy_client_id',
     clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy_client_secret',
-    callbackURL: "/api/auth/github/callback"
+    callbackURL: getCallbackUrl('github'),
+    proxy: true
   },
   (accessToken, refreshToken, profile, done) => {
       processOAuthProfile('GITHUB', profile, done);
