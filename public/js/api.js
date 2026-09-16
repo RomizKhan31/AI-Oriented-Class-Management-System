@@ -87,23 +87,23 @@ const showToast = (message, type = 'success') => {
     }
 };
 
-// Live Weather Widget for Tangail
-const initWeatherWidget = async () => {
+// Professional System Status Indicator
+const initSystemStatus = () => {
     // Only show on dashboards, not login page
     if (window.location.pathname === '/' || window.location.pathname === '/index.html') return;
 
     const nav = document.querySelector('.glass-nav');
     if (!nav) return;
 
-    const weatherContainer = document.createElement('div');
-    weatherContainer.className = 'weather-widget';
-    weatherContainer.style.cssText = `
+    const statusContainer = document.createElement('div');
+    statusContainer.className = 'system-status';
+    statusContainer.style.cssText = `
         display: flex;
         align-items: center;
         gap: 8px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 4px 10px;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.85rem;
         color: #e2e8f0;
@@ -111,53 +111,86 @@ const initWeatherWidget = async () => {
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         backdrop-filter: blur(10px);
         white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.3s ease;
     `;
 
     const rightSide = nav.querySelector('.d-flex.align-center.gap-3');
     if (rightSide) {
-        nav.insertBefore(weatherContainer, rightSide);
+        nav.insertBefore(statusContainer, rightSide);
     } else {
-        nav.appendChild(weatherContainer);
+        nav.appendChild(statusContainer);
     }
 
-    const updateWeather = async () => {
+    const updateStatus = async () => {
         try {
-            weatherContainer.innerHTML = '<span style="font-size:0.8rem">Loading weather...</span>';
-            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=24.2513&longitude=89.9167&current=temperature_2m,weather_code&timezone=auto');
-            const data = await res.json();
-
-            const temp = data.current.temperature_2m;
-            const code = data.current.weather_code;
-
-            // Map WMO weather codes to emojis
-            let icon = '🌤️';
-            let desc = 'Clear';
-            if (code <= 1) { icon = '☀️'; desc = 'Clear'; }
-            else if (code <= 3) { icon = '⛅'; desc = 'Partly Cloudy'; }
-            else if (code <= 48) { icon = '🌫️'; desc = 'Fog'; }
-            else if (code <= 55) { icon = '🌧️'; desc = 'Drizzle'; }
-            else if (code <= 65) { icon = '🌧️'; desc = 'Rain'; }
-            else if (code <= 77) { icon = '❄️'; desc = 'Snow'; }
-            else if (code <= 82) { icon = '🌦️'; desc = 'Showers'; }
-            else { icon = '⛈️'; desc = 'Thunderstorm'; }
-
-            weatherContainer.innerHTML = `
-                <span title="Tangail, Bangladesh" style="font-weight:600; color:var(--primary)">Tangail</span>
-                <span style="font-size: 1.2rem">${icon}</span>
-                <span style="font-weight: bold">${temp}°C</span>
-                <span style="font-size: 0.75rem; color: #94a3b8; margin-left:4px;">${desc}</span>
-            `;
+            const res = await apiFetch('/crisis/alerts');
+            if (res.alerts && res.alerts.length > 0) {
+                statusContainer.innerHTML = `
+                    <span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                    <span style="font-weight: 600; color: #ef4444;">${res.alerts.length} Alert${res.alerts.length > 1 ? 's' : ''}</span>
+                `;
+                statusContainer.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            } else {
+                statusContainer.innerHTML = `
+                    <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
+                    <span style="font-weight: 600; color: #22c55e;">System Normal</span>
+                `;
+                statusContainer.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+            }
         } catch (e) {
-            weatherContainer.innerHTML = '<span style="font-size:0.8rem; color:#f87171">Weather Unavailable</span>';
+            statusContainer.innerHTML = `
+                <span style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%;"></span>
+                <span style="font-weight: 600; color: #f59e0b;">Checking...</span>
+            `;
         }
     };
 
-    updateWeather();
-    // Update every 30 minutes
-    setInterval(updateWeather, 30 * 60 * 1000);
+    // Add pulse animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    updateStatus();
+    // Update every 30 seconds
+    setInterval(updateStatus, 30000);
+
+    // Click to show details
+    statusContainer.addEventListener('click', async () => {
+        try {
+            const res = await apiFetch('/crisis/alerts');
+            if (res.alerts && res.alerts.length > 0) {
+                const alertMessages = res.alerts.map(a => `• ${a.message}`).join('\n');
+                Swal.fire({
+                    title: 'System Alerts',
+                    text: alertMessages,
+                    icon: 'warning',
+                    confirmButtonColor: '#6366f1'
+                });
+            } else {
+                Swal.fire({
+                    title: 'System Status',
+                    text: 'All systems are operating normally.',
+                    icon: 'success',
+                    confirmButtonColor: '#6366f1'
+                });
+            }
+        } catch (e) {
+            Swal.fire({
+                title: 'Status Unavailable',
+                text: 'Unable to fetch system status.',
+                icon: 'error',
+                confirmButtonColor: '#6366f1'
+            });
+        }
+    });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    initCrisisAlert();
-    initWeatherWidget();
+    initSystemStatus();
 });

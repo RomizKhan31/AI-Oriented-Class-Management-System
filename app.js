@@ -36,6 +36,16 @@ app.use('/api/communication', require('./routes/communication'));
 app.use('/api/export', require('./routes/export'));
 app.use('/api/admin', require('./routes/admin'));
 
+// Error logging middleware - log all errors to console
+app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err);
+    console.error('Error stack:', err.stack);
+    console.error('Request URL:', req.url);
+    console.error('Request method:', req.method);
+    console.error('Request body:', req.body);
+    next(err);
+});
+
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Expose front-end

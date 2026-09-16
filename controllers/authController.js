@@ -28,6 +28,9 @@ exports.registerStudent = async (req, res) => {
 
         res.status(201).json({ message: 'Student registered successfully', userId: studentId });
     } catch (error) {
+        console.error('REGISTER STUDENT ERROR:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -88,6 +91,9 @@ exports.login = async (req, res) => {
             user: { id: user.id, name: user.name, email: user.email, role: user.role }
         });
     } catch (error) {
+        console.error('LOGIN ERROR:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

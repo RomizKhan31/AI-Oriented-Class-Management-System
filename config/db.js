@@ -20,4 +20,20 @@ const pool = process.env.DATABASE_URL
         queueLimit: 0
     });
 
+// Test database connection on startup
+pool.getConnection()
+    .then(connection => {
+        console.log('Database connected successfully');
+        connection.release();
+    })
+    .catch(err => {
+        console.error('DATABASE CONNECTION ERROR:', err.message);
+        console.error('Database config:', {
+            host: process.env.DB_HOST || 'localhost',
+            user: process.env.DB_USER || 'root',
+            database: process.env.DB_NAME || 'smart_class_db',
+            port: process.env.DB_PORT || 3306
+        });
+    });
+
 module.exports = pool;
