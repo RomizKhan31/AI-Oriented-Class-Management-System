@@ -94,7 +94,7 @@ async function initRemoteDB() {
         }
         
         console.log('Tables created. Inserting Demo users...');
-        const bcrypt = require('bcrypt');
+        const bcrypt = require('bcryptjs');
         const hash = await bcrypt.hash('password', 10);
         
         await pool.query("INSERT IGNORE INTO users (id, name, email, password_hash, role) VALUES ('A01', 'Admin Super', 'a@demo.com', ?, 'ADMIN')", [hash]);

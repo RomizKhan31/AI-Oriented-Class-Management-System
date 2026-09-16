@@ -21,7 +21,7 @@ async function initDB() {
         // Let's also create the demo credentials mentioned in index.html
         await connection.query('USE smart_class_db');
         
-        const bcrypt = require('bcrypt');
+        const bcrypt = require('bcryptjs');
         const hash = await bcrypt.hash('password', 10);
         
         await connection.query("INSERT IGNORE INTO users (id, name, email, password_hash, role) VALUES ('A01', 'Admin Super', 'a@demo.com', ?, 'ADMIN')", [hash]);
